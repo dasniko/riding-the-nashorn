@@ -1,7 +1,7 @@
 language: ruby
 rvm:
-- 2.2.0
-script: ./build.sh
+  - 2.2.0
+script: ./create.sh
 after_success: ./update-gh-pages.sh
 env:
   global:

@@ -18,6 +18,8 @@ The content goes here...
 
 some text
 
+image::nashorn.jpg[Nashorn]
+
 == Chapter 2
 
 === Sub-Chapter
