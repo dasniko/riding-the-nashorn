@@ -9,19 +9,16 @@
 :experimental:
 
 = Riding the Nashorn
-
-The content goes here...
-
--- Niko Köbler (http://www.n-k.de, niko@n-k.de, https://twitter.com/dasniko[@dasniko])
-
-== Chapter 1
-
-some text
+Niko Köbler <niko@n-k.de, http://www.n-k.de, https://twitter.com/dasniko[@dasniko]>
 
 image::nashorn.jpg[Nashorn]
 
-== Chapter 2
+The content goes here...
 
-=== Sub-Chapter
-
-bla
+include::nashorn.adoc[]
+include::api-extensions.adoc[]
+include::packagemanager.adoc[]
+include::isomorphic.adoc[]
+include::cli.adoc[]
+include::javafx.adoc[]
+include::testing.adoc[]
