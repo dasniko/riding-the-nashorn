@@ -104,13 +104,9 @@ print(calcResult);
 With this little example, you can find out, how Nashorn handles type conversions between Java and JavaScript, when calling Java methods from JavaScript.
 
 [source,java]
-.NashornTypes.java
 ----
-package my.package;
-public class NashornTypes {
-    public static void printType(Object object) {
-        System.out.println((object.getClass());
-    }
+public static void printType(Object object) {
+    System.out.println((object.getClass());
 }
 ----
 
@@ -118,45 +114,136 @@ Now, call this static method with different JavaScript types:
 
 [source,javascript]
 ----
-var NashornTypes = Java.type('my.package.NashornTypes');
-
-NashornTypes.printType("Hello");
+MyJavaClass.printType("Hello");
 // class java.lang.String
 
-NashornTypes.printType(123);
+MyJavaClass.printType(123);
 // class java.lang.Integer
 
-NashornTypes.printType(12.34);
+MyJavaClass.printType(12.34);
 // class java.lang.Double
 
-NashornTypes.printType(true);
+MyJavaClass.printType(true);
 // class java.lang.Boolean
 
-NashornTypes.printType(new Number(123));
+MyJavaClass.printType(new Number(123));
 // class jdk.nashorn.internal.objects.NativeNumber
+// class jdk.nashorn.api.scripting.ScriptObjectMirror
 
-NashornTypes.printType(new Date());
+MyJavaClass.printType(new Date());
 // class jdk.nashorn.internal.objects.NativeDate
+// class jdk.nashorn.api.scripting.ScriptObjectMirror
 
-NashornTypes.printType(new RegExp());
+MyJavaClass.printType(new RegExp());
 // class jdk.nashorn.internal.objects.NativeRegExp
+// class jdk.nashorn.api.scripting.ScriptObjectMirror
 
-NashornTypes.printType({foo: 'bar'});
+MyJavaClass.printType({foo: 'bar'});
 // class jdk.nashorn.internal.scripts.J04
+// class jdk.nashorn.api.scripting.ScriptObjectMirror
 ----
 
 - Primitive JavaScript types are converted to the appropriate Java wrapper class.
-- Native JavaScript objects are represented by internal adapter classes.
+- Native JavaScript objects are represented by internal adapter classes, respectively to `ScriptObjectMirror`.
 
 IMPORTANT: Don't rely on programming against / using internal classes in `jdk.nashorn.internal` as they are likely subject to change!
 
 
-=== Options
+=== ScriptObjectMirror
+
+The `ScriptObjectMirror` is part of the `jdk.nashorn.api` and is intended to be used in client-code instead of the internal classes.
+This mirror object is a representation of the underlying JavaScript object and provides access to it and its methods and properties.
+The `ScriptObjectMirror` implements the `Map` interface.
+
+We edit our last method slightly to
+
+[source,java]
+----
+public static void printObjectMirror(ScriptObjectMirror mirror) {
+    System.out.println(mirror.getClassName() + ": " + Arrays.toString(mirror.getOwnKeys(true)));
+}
+----
+
+When we call this method now with our last four JS function calls (number, date, regexp and object literal):
+
+[source,javascript]
+----
+MyJavaClass.printType(new Number(123));
+MyJavaClass.printType(new Date());
+MyJavaClass.printType(new RegExp());
+MyJavaClass.printType({
+    foo: 'bar',
+    bar: 'foo'
+});
+----
+
+we now get this result:
+
+[source]
+----
+Number: []
+Date: []
+RegExp: [lastIndex, source, global, ignoreCase, multiline]
+Object: [foo, bar]
+----
+
+Also, we can call member functions on JavaScript objects from Java. +
+Let's assume a JavaScript type `Person` with some properties and a function `getFullName()`.
+
+[source,javascript]
+----
+function Person(firstName, lastName) {
+  this.firstName = firstName;
+  this.lastName = lastName;
+  this.getFullName = function() {
+    return this.firstName + " " + this.lastName;
+  }
+}
+----
+
+The function `getFullName()` can be called on `ScriptObjectMirror` via `callMember()`:
+
+[source,java]
+----
+public static void getFullName(ScriptObjectMirror person) {
+    System.out.println("Full name is: " + person.callMember("getFullName"));
+}
+----
+
+Now, our JavaScript code looks like this:
+
+[source,javascript]
+----
+var person = new Person('John', 'Doe');
+MyJavaClass.getFullName(person);
+
+// Full name is: John Doe
+----
+
+
+=== Options for the script engine
+
+Nashorn script engine customization can be done by using `nashorn.args` system properties.
+Just specify the options you want with `*-Dnashorn.args=...*`
+E.g. enabling the scripting mode:
+
+[source,bash]
+----
+$ java -Dnashorn.args=-scripting MyJavaClass
+----
+
+You can also create a Nashorn engine by passing customization options programmatically.
+In this case, you'll have to instantiate `NashornScriptEngineFactory` directly:
+
+[source,java]
+----
+NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
+ScriptEngine engine = factory.getScriptEngine(new String[] { "-scripting" });
+----
+
+NOTE: Available options can be determined from the link:#_nashorn_at_the_command_line_interface_cli[command line] when calling `jjs -help`.
 
 
 === Bindings / Context
-
-
-=== ScriptObjectMirror
 
 

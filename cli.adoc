@@ -5,7 +5,7 @@ Nashorn comes with a command line client named `jjs`.
 This client is located in `$JAVA_HOME/bin`, but there's no shortcut/link/path integration after installation Java 8.
 So, if you want to work with `jjs` - and that's what we want to do here - you should create a link to the tool:
 
-[source,sh]
+[source,bash]
 ----
 $ cd /usr/bin
 $ ln -s $JAVA_HOME/bin/jjs jjs
@@ -32,11 +32,13 @@ var y = 20;
 print(x + y);
 ----
 
-[source,sh]
+[source,bash]
 ----
 $ jjs test.js
 30
 ----
+
+==== Exiting
 
 The `jjs` client can be exited by calling
 
@@ -49,13 +51,22 @@ jjs> quit()
 jjs> quit(1)
 ----
 
+==== Help / Options
+
+List all options of `jjs` by calling it with the `-help` option:
+
+[source,bash]
+----
+$ jjs -help
+----
+
 
 === Scripting mode
 
 In addition to the ECMAScript 5.1 specification, Nashorn implements a number of own syntax and API extensions as well _(see one of the next chapters)_.
 Many of these extensions are only available in `scripting` mode. `Scripting` mode is turned on by using the cli option `--scripting`:
 
-[source,sh]
+[source,bash]
 ----
 $ jjs --scripting
 ----
@@ -83,7 +94,7 @@ So, instead of calling your JavaScript file like the traditional way:
 print('hello');
 ----
 
-[source,sh]
+[source,bash]
 ----
 $ jjs test.js
 ----
@@ -99,7 +110,7 @@ print('hello');
 
 make it executable and call it from the command line, like any other shell script:
 
-[source,sh]
+[source,bash]
 ----
 $ chmod 755 test.js
 $ ./test.js
