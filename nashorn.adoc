@@ -1,1 +1,162 @@
-== Nashorn JavaScript Engine
+== Nashorn JavaScript Engine from within Java
+
+The Nashorn Engine is a JavaScript implementation of the https://www.jcp.org/en/jsr/detail?id=223[JSR-223] _(Scripting for the Java Platform)_. It implements the `javax.script` API.
+So, for being able to evaluate JavaScript code from Java, we just create a new Nashorn `javax.script.ScriptEngine`.
+
+[source,java]
+----
+ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+engine.eval("print('Hello World');");
+----
+
+As seen above, JavaScript code can be evaluated directly by passing it as a string to the `eval()` method of the engine object.
+Alternatively you can parse a `.js`-file by passing a `FileReader` object pointing to your file:
+
+[source,java]
+----
+ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+engine.eval(new FileReader('test.js'));
+----
+
+
+=== Invoking JavaScript functions from Java
+
+It's not only possible to run single JS statements or evaluate complete JS files, but it's also possible to invoke JavaScript functions from within Java code.
+Additionally you can pass Java objects as function arguments and return data back from the function to the calling Java method.
+
+Let's assume our JavaScript file:
+
+[source,javascript]
+.example.js
+----
+var sayHello = function(name) {
+  print('Hello, ' + name + '!');
+  return 'hello from javascript';
+};
+----
+
+To be able to call our defined `sayHello` function, we first have to cast the `engine` object to the `Invocable` interface, which is implemented by the `NashornScriptEngine` implementation.
+The `Invocable` interface provides the `invokeFunktion()` method, which allows to call JavaScript functions for a given name and pass arguments:
+
+[source,java]
+----
+ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+engine.eval(new FileReader('example.js'));
+
+Invocable invocable = (Invocable) engine;
+
+Object result = invocable.invokeFunction("sayHello", "John Doe");
+System.out.println(result);
+System.out.println(result.getClass());
+
+// Hello, John Doe!
+// hello from javascript
+// class java.lang.String
+----
+
+Our code prints three lines to the console: The JavaScript function `print()` pipes the result to `System.out`, afterwards, the two Java `System.out.println()` methods are evaluated.
+
+
+=== Invoking Java methods from JavaScript
+
+Calling or invoking Java methods from JavaScript code is just as easy as vice-versa. Let's assume a Java class with two methods:
+
+[source,java]
+.MyJavaClass.java
+----
+package my.package;
+
+public class MyJavaClass {
+
+    public static String sayHello(String name) {
+        return String.format("Hello %s from Java!", name);
+    }
+
+    public int add(int a, int b) {
+        return a + b;
+    }
+
+}
+----
+
+Our Java class can be referenced from JavaScript via the `Java.type` API extension. This is similar to the `import` statement in Java.
+After referencing our Java class, we can call the static method and print the result to `System.out`.
+Since the `sayHello()` method is static, we don't have to create an instance as we have to do for calling the `add()` method.
+
+[source,javascript]
+----
+var MyJavaClass = Java.type('my.package.MyJavaClass');
+
+var greetingResult = MyJavaClass.sayHello('John Doe');
+print(greetingResult);
+
+var myClass = new MyJavaClass();
+var calcResult = myClass.add(1, 2);
+print(calcResult);
+
+// Hello John Doe from Java!
+// 3
+----
+
+
+==== Nashorn type conversions
+
+With this little example, you can find out, how Nashorn handles type conversions between Java and JavaScript, when calling Java methods from JavaScript.
+
+[source,java]
+.NashornTypes.java
+----
+package my.package;
+public class NashornTypes {
+    public static void printType(Object object) {
+        System.out.println((object.getClass());
+    }
+}
+----
+
+Now, call this static method with different JavaScript types:
+
+[source,javascript]
+----
+var NashornTypes = Java.type('my.package.NashornTypes');
+
+NashornTypes.printType("Hello");
+// class java.lang.String
+
+NashornTypes.printType(123);
+// class java.lang.Integer
+
+NashornTypes.printType(12.34);
+// class java.lang.Double
+
+NashornTypes.printType(true);
+// class java.lang.Boolean
+
+NashornTypes.printType(new Number(123));
+// class jdk.nashorn.internal.objects.NativeNumber
+
+NashornTypes.printType(new Date());
+// class jdk.nashorn.internal.objects.NativeDate
+
+NashornTypes.printType(new RegExp());
+// class jdk.nashorn.internal.objects.NativeRegExp
+
+NashornTypes.printType({foo: 'bar'});
+// class jdk.nashorn.internal.scripts.J04
+----
+
+- Primitive JavaScript types are converted to the appropriate Java wrapper class.
+- Native JavaScript objects are represented by internal adapter classes.
+
+IMPORTANT: Don't rely on programming against / using internal classes in `jdk.nashorn.internal` as they are likely subject to change!
+
+
+=== Options
+
+
+=== Bindings / Context
+
+
+=== ScriptObjectMirror
+
+
