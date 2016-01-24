@@ -1,1 +1,110 @@
 == Nashorn at the Command Line Interface (CLI)
+
+Nashorn comes with a command line client named `jjs`.
+
+This client is located in `$JAVA_HOME/bin`, but there's no shortcut/link/path integration after installation Java 8.
+So, if you want to work with `jjs` - and that's what we want to do here - you should create a link to the tool:
+
+[source,sh]
+----
+$ cd /usr/bin
+$ ln -s $JAVA_HOME/bin/jjs jjs
+$ jjs
+jjs> print('Hello World');
+----
+
+You can now evaluate JavaScript code directly in the jjs shell.
+
+[source,js]
+----
+jjs> var x = 10;
+jjs> print(x);
+10
+----
+
+Additionally you can load and execute JavaScript files with the `jjs` tool:
+
+[source,js]
+.test.js
+----
+var x = 10;
+var y = 20;
+print(x + y);
+----
+
+[source,sh]
+----
+$ jjs test.js
+30
+----
+
+The `jjs` client can be exited by calling
+
+[source,js]
+----
+jjs> exit()
+jjs> exit(1)
+
+jjs> quit()
+jjs> quit(1)
+----
+
+
+=== Scripting mode
+
+In addition to the ECMAScript 5.1 specification, Nashorn implements a number of own syntax and API extensions as well _(see one of the next chapters)_.
+Many of these extensions are only available in `scripting` mode. `Scripting` mode is turned on by using the cli option `--scripting`:
+
+[source,sh]
+----
+$ jjs --scripting
+----
+
+In `scripting` mode, nashorn accepts shell style `#` single line comments:
+
+[source,js]
+.test.js
+----
+# style line comment -scripting mode
+# prints hello
+
+print('hello');
+----
+
+
+=== Shebang
+
+Nashorn supports shebang scripting.
+So, instead of calling your JavaScript file like the traditional way:
+
+[source,js]
+.test.js
+----
+print('hello');
+----
+
+[source,sh]
+----
+$ jjs test.js
+----
+
+Just write your JavaScript file like the following with a shebang at first line:
+
+[source,js]
+.test.js
+----
+#!/usr/bin/jjs
+print('hello');
+----
+
+make it executable and call it from the command line, like any other shell script:
+
+[source,sh]
+----
+$ chmod 755 test.js
+$ ./test.js
+----
+
+NOTE: You'll need to have a link to `jjs` as mentioned at the beginning of this chapter. +
+Scripting mode is automatically enabled when running shebang Nashorn scripts.
+

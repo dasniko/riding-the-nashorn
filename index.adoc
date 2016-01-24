@@ -11,14 +11,23 @@
 = Riding the Nashorn
 Niko Köbler <niko@n-k.de, http://www.n-k.de, https://twitter.com/dasniko[@dasniko]>
 
+Nashorn is the official JavaScript Engine in the Java Virtual Machine since Version 8.
+It supports and implements the ECMAScript 5.1 specification and competes among others directly with https://developers.google.com/v8/[Google V8] (the script enginge behind https://nodejs.org[Node.js]).
+Nashorn compiles JavaScript to Java Bytecode during runtime and thus provides high interoperability of Java and JavaScript.
+
 image::nashorn.jpg[Nashorn]
 
-The content goes here...
+In this script I want to dig into some of the (IMO) most used options, functions, features, and use-cases.
+After working through this tutorial you'll be able to use Nashorn and its dynamic scripting features in your daily Java business.
 
+_Another good starting point for Nashorn resources might be the http://openjdk.java.net/projects/nashorn/[Official Project Nashorn Website] with links to the mailing-list, the blog and the wiki pages. Check it out!_
+
+
+include::cli.adoc[]
 include::nashorn.adoc[]
 include::api-extensions.adoc[]
 include::packagemanager.adoc[]
 include::isomorphic.adoc[]
-include::cli.adoc[]
 include::javafx.adoc[]
 include::testing.adoc[]
+
