@@ -6,6 +6,7 @@ Niko Köbler <niko@n-k.de, http://www.n-k.de, https://twitter.com/dasniko[@dasni
 :numbered:
 :icons: font
 :imagesdir: images
+:source-highlighter: coderay
 
 Nashorn is the official JavaScript Engine in the Java Virtual Machine since Version 8.
 It supports and implements the http://www.ecma-international.org/ecma-262/5.1/[ECMAScript 5.1 specification] and competes among others directly with https://developers.google.com/v8/[Google V8] (the script enginge behind https://nodejs.org[Node.js]).

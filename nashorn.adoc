@@ -246,4 +246,41 @@ NOTE: Available options can be determined from the link:#_nashorn_at_the_command
 
 === Bindings / Context
 
+A `ScriptContext` contains one or more bindings, each associated to a scope. By default, there are two scopes:
+
+- `ENGINE_SCOPE`
+- `GLOBAL_SCOPE`
+
+When a Nashorn engine is created, it creates a default context:
+
+[source,java]
+----
+ScriptContext defaultContext = engine.getContext();
+----
+
+The default context's `ENGINE_SCOPE` is the scope where ECMAScript "global" objects and functions (`Object`, `Function`, `Math`, `RegExp`, `parseInt`, etc.) are stored.
+The `GLOBAL_SCOPE` is shared between all engines created by the same `ScriptEngineManager`.
+
+You can store variables in the context (use of the scope is optional, default is `ENGINE_SCOPE`):
+
+[source,javascript]
+----
+ScriptContext context = engine.getContext();
+// stores an object under the key `myKey` in the (engine scoped) context
+context.setAttribute("myKey", object, ScriptContext.ENGINE_SCOPE);
+// retrieves the object with key `myKey` from (engine scoped) context
+context.getAttribute("myKey", ScriptContext.ENGINE_SCOPE);
+
+Bindings b = context.getBindings(ScriptContext.ENGINE_SCOPE);
+b.get("Object");    // gets ECMAScript "Object" constructor
+b.get("undefined"); // ECMAScript 'undefined' value
+----
+
+
+
+If a variable is not found in `ENGINE_SCOPE`, `GLOBAL_SCOPE` bindings are being searched.
+
+WARNING: There's a confusion due to ECMAScript "global" properties being in `ENGINE_SCOPE` (toplevel _"this"_ in script) and not in `GLOBAL_SCOPE`.
+
+NOTE: More on ScriptContexts and Bindings: https://wiki.openjdk.java.net/display/Nashorn/Nashorn+jsr223+engine+notes
 
