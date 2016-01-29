@@ -282,5 +282,7 @@ If a variable is not found in `ENGINE_SCOPE`, `GLOBAL_SCOPE` bindings are being 
 
 WARNING: There's a confusion due to ECMAScript "global" properties being in `ENGINE_SCOPE` (toplevel _"this"_ in script) and not in `GLOBAL_SCOPE`.
 
+---
+
 NOTE: More on ScriptContexts and Bindings: https://wiki.openjdk.java.net/display/Nashorn/Nashorn+jsr223+engine+notes
 

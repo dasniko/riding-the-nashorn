@@ -1,1 +1,343 @@
 == API and Language Extensions
+
+Nashorn comes along with quite a few language and API extensions, additionally to the ECMAScript standard.
+Let's have a look at some of the IMHO most useful and interessting ones.
+
+=== Print Function
+
+Nashorn comes with a handy `print` function, which prints its arguments (after converting it to a string) to standard out:
+
+[source,javascript]
+----
+print("Hello", "World");
+// Hello World
+----
+
+=== Java Beans
+
+With Nashorn, you get direct access to the properties of a Java bean, no need to use getters and setters anymore:
+
+[source,javascript]
+----
+var Date = Java.type('java.util.Date');
+var date = new Date();
+date.year += 1900;
+print(date.year);  // 2015
+----
+
+=== Function Literals
+
+For simple, one-line functions, we don't necessarily have to use curly braces (and can also ommit the `return` keyword):
+
+[source,javascript]
+----
+function add(a, b) a + b;
+print(add(1, 2);  // 3
+----
+
+=== Binding Properties
+
+You can bind properties from one object to another object:
+
+[source,javascript]
+----
+var o1 = {};
+var o2 = { foo: 'bar'};
+
+Object.bindProperties(o1, o2);
+
+print(o1.foo);    // bar
+o1.foo = 'John';
+print(o2.foo);    // John
+----
+
+=== Trimming Strings
+
+Additionally to `.trim()`, you can just trim your string object on the left or the right:
+
+[source,javascript]
+----
+print("   bar".trimLeft());           // bar
+print("foo   ".trimRight() + "bar");  // foobar
+----
+
+=== Whereis
+
+In case you get lost while programming:
+
+[source,javascript]
+----
+print(__FILE__, __LINE__, __DIR__);
+----
+
+=== Import Scopes
+
+Sometimes it's useful to import many java packages at once.
+We can use the class `JavaImporter` to be used in conjunction with the `with` statement.
+All class files from the imported packages are accessible within the local scope of the `with` statement:
+
+[source,javascript]
+----
+var imports = new JavaImporter(java.io, java.lang);
+with (imports) {
+    var file = new File(__FILE__);
+    System.out.println(file.getAbsolutePath());  // /path/to/my/script.js
+}
+----
+
+=== Packages
+
+Packages and related objects are there to support java package, class access from script.
+The properties of the `Packages` variable are all the top-level Java packages, such as `java`, `javax` etc.
+
+[source,javascript]
+----
+var Vector = Packages.java.util.Vector;
+
+// but short-cuts defined for important package prefixes like
+//    Packages.java, Packages.javax, Packages.com
+//    Packages.edu, Packages.javafx, Packages.org
+
+var JFrame = javax.swing.JFrame;  // javax == Packages.javax
+var List = java.util.List;        // java == Packages.java
+----
+
+[source,bash]
+----
+jjs> Packages.java
+[JavaPackage java]
+jjs> java
+[JavaPackage java]
+jjs> java.util.Vector
+[JavaClass java.util.Vector]
+jjs> javax
+[JavaPackage javax]
+jjs> javax.swing.JFrame
+[JavaClass javax.swing.JFrame]
+----
+
+=== Typed Arrays
+
+Native JavaScript arrays are untyped.
+Nashorn implements typed arrays as specified at https://www.khronos.org/registry/typedarray/specs/latest/.
+
+For example, create an array of `int` 's:
+
+[source,javascript]
+----
+var IntArray = Java.type("int[]");
+
+var array = new IntArray(3);
+var array[0] = 3;
+var array[1] = 2;
+var array[2] = 1;
+
+try {
+    array[3] = 0;  // would be possible in pure JS
+} catch (e) {
+    print(e.message);  // Array index out of range: 3
+}
+
+array[0] = "42";
+print(array[0]);  // 42
+
+array[0] = "some wrong type";
+print(array[0]);  // 0
+
+array[0] = "3.14";
+print(array[0]);  // 3
+----
+
+Our `int[]` array behaves like a real Java int array.
+Additionally, Nashorn performs implicit type conversion when trying to add some non-integer values.
+Strings will automatically be converted to `int`, if possible.
+
+=== Collections and For-Each
+
+Array handling in JavaScript is sometimes annoying. Let's use Java collections instead!
+
+[source,javascript]
+----
+var ArrayList = Java.type('java.util.ArrayList');
+var myList = new ArrayList();
+myList.add('John');
+myList.add('Jack');
+myList.add('Joe');
+
+for each (var e in list) print(e);  // John, Jack, Joe
+----
+
+Nashorns `for each` statement works like the `foreach` in Java.
+
+Or, let's use a `HashMap`:
+
+[source,javascript]
+----
+var map = new java.util.HashMap();
+map.put('foo', 'red');
+map.put('bar', 'green');
+
+for each (var e in map.keySet()) print(e);  // foo, bar
+
+for each (var e in map.values()) print(e);  // red, green
+----
+
+=== Convert Arrays
+
+Some packages like `java.util` (and `java.lang`) can be accessed directly without utilizing `Java.type` or `JavaImporter`:
+
+[source,javascript]
+----
+var list = new java.util.ArrayList();
+list.add("John");
+list.add("Jack");
+list.add("Joe");
+----
+
+This code converts the Java list to a native JavaScript array:
+
+[source,javascript]
+----
+var jsArray = Java.from(list);
+print(jsArray);                                  // John,Jack,Joe
+print(Object.prototype.toString.call(jsArray));  // [object Array]
+----
+
+And vice versa:
+
+[source,javascript]
+----
+var javaArray = Java.to([1, 2, 3, 5, 8, 13], "int[]");
+----
+
+=== Lambdas and Streams
+
+As Lambdas and Streams are available since Java 8, it's also possible to work with them in Nashorn! \o/
+
+Although ECMAScript 5.1 lacks the compact arrow syntax from the Java 8 lambda expressions, we can use function literals where ever lambda expressions are accepted.
+
+[source,javascript]
+----
+var list = new java.util.ArrayList();
+list.add("a1");
+list.add("b1");
+list.add("c1");
+list.add("a3");
+list.add("b3");
+list.add("c3");
+list.add("a2");
+list.add("b2");
+list.add("c2");
+
+list
+    .stream()
+    .filter(function(e) {
+        return e.startsWith("b");
+    })
+    .sorted()
+    .forEach(function(e) {
+        print(e);
+    });
+// a1, a2, a3
+----
+
+=== Extending Classes
+
+Java types can simply be extended with the `Java.extend` extension.
+
+[source,javascript]
+----
+var Runnable = Java.type('java.lang.Runnable');
+var Printer = Java.extend(Runnable, {
+    run: function() {
+        print('printed from a separate thread');
+    }
+});
+
+var Thread = Java.type('java.lang.Thread');
+new Thread(new Printer()).start();
+
+new Thread(function() {
+    print('printed from another thread');
+}).start();
+
+// printed from a separate thread
+// printed from another thread
+----
+
+TIP: As you can see, even multi-threaded code is possible in Nashorn.
+
+=== Calling Super
+
+Accessing overridden members in JavaScript is traditionally awkward because Javas `super` keyword doesn't exist in ECMAScript.
+Luckily nashorn goes to the rescue.
+
+First we define a super type in java code:
+
+[source,java]
+----
+class SuperRunner implements Runnable {
+    @Override
+    public void run() {
+        System.out.println("super run");
+    }
+}
+----
+
+Next we override `SuperRunner` from JavaScript.
+Pay attention to the extended Nashorn syntax when creating a new `Runner` instance:
+The syntax of overriding members is borrowed from Javas anonymous objects.
+
+[source,javascript]
+----
+var SuperRunner = Java.type('dasniko.SuperRunner');
+var Runner = Java.extend(SuperRunner);
+
+var runner = new Runner() {
+    run: function() {
+        Java.super(runner).run();
+        print('local run');
+    }
+}
+runner.run();
+
+// super run
+// local run
+----
+
+We call the overridden method `SuperRunner.run()` by utilizing the `Java.super` extension.
+
+=== Loading Scripts
+
+Loading and evaluating additional script files from Nashorn JavaScript is quite easy with the `load` function.
+We can load local and external files.
+
+In our example, we load the http://momentjs.com/[moment.js] library to calculate some dates and times:
+
+[source,javascript]
+----
+load('https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.1/moment.min.js');
+
+var now = new moment();
+print(now);
+// Thu Dec 31 2015 23:59:59 GMT+0100
+----
+
+The (external) script will be evaluated in the same context, so we can access the `moment` function directly.
+
+==== Load in new Global Context
+
+Loading external files can break your own code, when it is using same variable names as your code!
+To avoid this, files can be loaded into a new global scope:
+
+[source,javascript]
+----
+loadWithNewGlobal('script.js');
+----
+
+Of course, the script is then only available in the Nashorn global context (not current engine context).
+
+---
+
+NOTE: An explicit description of all language and API extensions in Nashorn can be found at the https://wiki.openjdk.java.net/display/Nashorn/Nashorn+extensions[Wiki page].
+
