@@ -13,6 +13,34 @@ print("Hello", "World");
 // Hello World
 ----
 
+=== String Interpolation
+
+You can specify expressions inside string literals with the `${expression}` syntax.
+The string value is computed by substituting the name of the `${expr}` expression with the value of the corresponding variable.
+
+[source,javascript]
+----
+var name = "World";
+var str = "Hello, %{name}!";
+print(str);
+// Hello, World!
+----
+
+=== Back-quote exec expressions
+
+Nashorn supports Unix shell like back quote strings.
+Back quoted strings are evaluated by executing the programs mentioned in the string and returning value produced by the 'exec'-ed program.
+
+[source,javascript]
+----
+var files = `ls -l`;  // get file listing as a string
+var lines = files.split("\n");
+for (var l in lines) {
+    var line = lines[l];
+    print(line);
+}
+----
+
 === Java Beans
 
 With Nashorn, you get direct access to the properties of a Java bean, no need to use getters and setters anymore:
@@ -241,6 +269,26 @@ list
 // a1, a2, a3
 ----
 
+TIP: Where ever a Java 8 Lambda or SAM (single-abstract-method) type is required, an ECMAScript function can be passed as argument!
+
+==== Every Lambda is a Script Function
+
+Any Java object that is an instance of lambda type can be treated like a script function.
+
+[source,javascript]
+----
+var JFunction = Java.type('java.util.function.Function')
+
+var obj = new JFunction() {
+   apply: function(x) { print(x * x) }
+}
+
+print(typeof obj); // prints "function"
+
+// 'calls' lambda as though it is a function
+obj(23);
+----
+
 === Extending Classes
 
 Java types can simply be extended with the `Java.extend` extension.
@@ -290,7 +338,7 @@ The syntax of overriding members is borrowed from Javas anonymous objects.
 
 [source,javascript]
 ----
-var SuperRunner = Java.type('dasniko.SuperRunner');
+var SuperRunner = Java.type('my.package.SuperRunner');
 var Runner = Java.extend(SuperRunner);
 
 var runner = new Runner() {
@@ -336,6 +384,108 @@ loadWithNewGlobal('script.js');
 ----
 
 Of course, the script is then only available in the Nashorn global context (not current engine context).
+
+=== Error Object
+
+Nashorn extends the ECMAScript standard `Error` object by a few more interesting informations.
+
+[source,javascript]
+----
+function func() {
+    throw new Error();
+}
+
+function f() {
+    func();
+}
+
+try {
+    f()
+} catch (e) {
+    print(e.stack);
+    print(e.lineNumber);
+    print(e.columnNumber);
+    print(e.fileName);
+
+    e.printStackTrace();
+}
+----
+
+=== Scripting Mode Extension Objects
+
+There are some global object defined in Nashorn, when `-scripting` mode is enabled.
+
+Most of them are self-explaining, so I provided just some source code examples:
+
+==== $ARG
+
+[source,bash]
+----
+$ jjs -scripting -- arg1 arg2 arg3
+jjs> $ARG
+arg1,arg2,arg3
+jjs> $ARG[1]
+arg2
+----
+
+==== $ENV
+
+[source,javascript]
+----
+// print $JAVA_HOME and $PATH from the OS shell
+print($ENV["JAVA_HOME"])
+print($ENV["PATH"])
+print($ENV.JAVA_HOME)
+print($ENV.PATH)
+----
+
+==== $EXEC
+
+Launch processes to run commands.
+
+[source,bash]
+----
+jjs> $EXEC("ls -l")
+total 0
+drwxr-xr-x+ 1 johndoe staff 4096 Dec 31 12:34 dir
+-rwxrw-r--  1 johndoe staff  168 Dec 31 13:37 file.txt
+
+jjs> $EXEC("cat", "Send this to stdout")
+Send this to stdout
+----
+
+==== $OUT
+
+Store the latest standard output (stdout) of the process spawned by `$EXEC`.
+
+[source,javascript]
+----
+// use curl to download JSON weather data from the net
+var str = `curl http://api.openweathermap.org/data/2.5/weather?q=Hamburg,de&units=metric&appid=44db6a862fba0b067b1930da0d769e98`;
+
+// parse JSON and print the current temperature
+var weather = JSON.parse($OUT);
+print(weather.main.temp);
+----
+
+==== $ERR
+
+Store the latest standard error (stderr) of the process spawned by `$EXEC`.
+
+==== $EXIT
+
+Store the exit code of the process spawned by `$EXEC`.
+
+==== $OPTIONS
+
+This property exposes command line options, which are passed (explit or implicitly) to Nashorn "command line".
+
+[source,javascript]
+----
+print("-scripting = " + $OPTIONS._scripting);         // -scripting = true
+print("--compile-only = " + $OPTIONS._compile_only);  // --compile-only = false
+print("-timezone = " + $OPTIONS._timezone.ID);        // -timezone = Europe/Berlin
+----
 
 ---
 
