@@ -1,7 +1,135 @@
-== Testing of Nashorn Scripts
+== Testing and Debugging of Nashorn Scripts
 
-=== JUnit
+=== Testing
 
-=== Spock
+Testing of Nashorn scripts is not that hard as it may look like if you're not used to it.
 
-=== Jasmine
+
+==== Function(al) testing with JUnit
+
+Because every JavaScript function has a return value (yes, every JavaScript function, even functions which have no explicit return value will return `undefined`), these values can be asserted.
+Just built up your JavaScript file properly and working with testable, independend, hopefully atomic, functions, just as you would develop your Java methods.
+Then, you can just call a JS function in your test and assert the result.
+
+Let's assume we have the following JavaScript code:
+
+[source,javascript]
+.calc.js
+----
+var add = function(a, b) {
+    return a + b;
+}
+
+var square = function(a) {
+    return a * a;
+}
+----
+
+You can then test the functions with a standard JUnit test
+
+[source,java]
+.CalculatorTest.java
+----
+public class CalculatorTest {
+
+    ScriptEngine nashorn;
+
+    @Before
+    public void setup() {
+        nashorn = new ScriptEngineManager().getEngineByName("nashorn");
+        nashorn.eval(new InputStreamReader(
+                getClass().getClassLoader().getResourceAsStream("/calc.js")));
+    }
+
+    @Test
+    public void testAdd() throws Exception {
+        Object result = ((Invocable) nashorn).invokeFunction("add", 1, 2);
+        Assert.assertEquals(1, result);
+    }
+
+    @Test
+    public void testSquare() throws Exception {
+        Object result = ((Invocable) nashorn).invokeFunction("square", 2);
+        Assert.assertEquals(4, result);
+    }
+}
+----
+
+
+==== Mocking JavaScript functions & using Spock
+
+A much more nicer (and also more powerful) way of testing Nashorn scripts is to use https://code.google.com/p/spock[Spock] instead of JUnit.
+Spock is based on Groovy code and since Groovy is also a dynamic language, it's easier to handle objects and functions created with Groovy between Nashorn and your tests (or _specs_, as tests are called in Spock).
+
+With Spock it becomes very easy to mock functions, which aren't under your control or which are not available in Nashorn.
+This could be callback functions (which are widely used in JavaScript), which you don't want to execute during your test, or e.g. the `alert()` function, which Nashorn doesn't know.
+
+
+[source,groovy]
+.Callback.groovy
+----
+class CallbackSpec {
+
+    @Shared ScriptEngine nashorn = new ScriptEngineManager().getEngineByName('nashorn');
+
+    def "callback"() { // <1>
+        given:
+        nashorn.eval('function callMe(callback) { return callback("") + " Doe"; }')
+
+        when:
+        def result = nashorn.invokeFunction('callMe', { return 'John' } as Function)
+
+        then:
+        result == 'John Doe'
+    }
+
+    def "mocked callback"() { // <2>
+        given:
+        nashorn.eval('function callMe(callback) { return callback("") + " Doe"; }')
+        def callback = Mock(Function)
+
+        when:
+        def result = nashorn.invokeFunction('callMe', callback)
+
+        then:
+        1 * callback.apply('') >> 'John'
+        result == 'John Doe'
+    }
+
+    def "alert"() { // <3>
+        given:
+        nashorn.eval('function alertMe() { alert("Huh!"); }')
+        def alert = Mock(Function)
+        nashorn.put('alert', alert)
+
+        when:
+        nashorn.invokeFunction('alertMe')
+
+        then:
+        1 * alert.apply('Huh!')
+    }
+
+}
+----
+<1> This function gets a another callback function (of type `java.util.function.Function`) injected when invoking the test.
+<2> In this function the callback function is being mocked and afterwards it's being tested, if the mock function was called once with value _"John"_.
+<3> Because there is no `alert()` function available in Nashorn, we have to mock it also and add it to the Nashorn context before invoking the actual function.
+
+
+NOTE: Further examples with Spock and Nashorn can be found in the GitHub repository https://github.com/dasniko/nashorn-spock-jasmine[dasniko/nashorn-spock-jasmine].
+
+
+=== Debugging
+
+Debugging of Nashorn JavaScript is supported by major IDEs like
+
+* JetBrains *IntelliJ IDEA* (since version 13.1)
+** https://blog.jetbrains.com/idea/2014/03/debugger-for-jdk8s-nashorn-javascript-in-intellij-idea-13-1/
+* Oracle *Netbeans* (since version 8)
+** http://wiki.netbeans.org/NetBeans_80_NewAndNoteworthy#JavaScript_in_Nashorn
+** https://blogs.oracle.com/geertjan/entry/youtube_debugger_for_jdk8_s
+** https://blogs.oracle.com/sundararajan/entry/remote_debugging_of_nashorn_scripts
+* *Eclipse*
+** should be possible with https://github.com/Nodeclipse/nodeclipse-1[Nodeclipse]
+** _(no further info available, as I'm not an Eclipse user anymore...)_
+
