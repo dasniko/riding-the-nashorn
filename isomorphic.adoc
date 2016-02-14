@@ -1,9 +1,418 @@
 == Isomorphic JavaScript
 
-=== Isomorphic?
+
+=== What does _Isomorphic_ mean, what can I do with it and why should I use it?
+
+Isomorphic comes from the Greek _"isos"_ for _"equal"_ and _"morph"_ for _"shape"_.
+
+[quote, 'http://isomorphic.net/javascript']
+____
+Isomorphism describes that if you look at the same entity <1> in two different contexts <2>, you should get the same thing <3>.
+____
+<1> code
+<2> client and server
+<3> result, html, DOM, etc.
+
+In our case:
+
+____
+If we use the same code on client and server, we should get the same result/html.
+____
+
+image::isomorphic.png[Isomorphic]
+
+
+==== Isomorphic code
+
+Isomorphic code supports you to code with the *DRY principle* (Don't Repeat Yourself), as you can *share the same logic* on client and server side.
+You only have to develop your application logic once and *maintain only one codebase*.
+In cases of errors, there is only one *single point of truth* _(or failure)_ to lookup for the fix.
+And last, but not least, isomorphic code leads you and your developers to be able to focus on a *single technology*, so you don't have to be experts on multiple programming languages.
+
+===== Example
+
+Think of your perfect password validation function, which you developed in JavaScript for the usage in the browser.
+
+[source,javascript]
+----
+function isPasswordValid(password) {
+    var score = scorePasswordStrength(password);
+    return score >= 3;
+}
+----
+
+This works pretty well, but to prevent that users disable JavaScript in the browser and pass an invalid password to the server,
+you'll have to develp the same logic again the programming language used on the server, perhaps Java.
+This is additional effort, can lead to implementation errors, something may be forgotten in implementation, latest on maintenance.
+_Why not re-use the above logic in your Java code?_
+
+[source,java]
+----
+public Boolean isPasswordValid(String password) {
+    try {
+        return (Boolean) nashorn.invokeFunction("isPasswordValid", password);
+    } catch (ScriptException | NoSuchMethodException e) {
+        throw new RuntimeException(e);
+    }
+}
+----
+
+
+==== SPAs
+
+Most of modern _Single Page Web Applications_ (SPA), only consist of just a html skeleton and one or more JavaScript libraries,
+which render the whole application UI and is responsible for all transitions, path routings, navigations and logic:
+
+[source,xml]
+.index.html
+----
+<html>
+<head>
+    <title>Awesome Website</title>
+    <script src="./app-bundle.js"></script>
+</head>
+<body></body>
+</html>
+----
+
+These applications are (mostyl) awesome, but have some drawbacks:
+
+===== Cons
+
+. *UX / Performance* - The user doesn't see anything before the whole script code is loaded, evaluated and executed on the client/browser.
+.. Long wait time, even on fast internet connections.
+.. Users will possibly go away (3sec. rule!).
+.. Think of slow internet connections!
+. *Legacy Browsers* (and there are still a lot out there!) can't evaluate your fancy new JavaScript stuff.
+. *SEO* - Search engines can't index your website, because there is no content!
+.. Even if Google can now evaluate JavaScript on websites, it's still error-prone and a mess!
+
+So, perhaps it's better to render the web pages on the server?
+
+===== Pros
+
+But what about
+
+* *UX* - cool transition effects
+* *Performance* - faster rendering of only parts/fragments of the entire page
+* *Performance* - only send the needed data over the wire, instead of the whole html page
+
+These advantages can only be achieved by running the application and rendering the pages on the client!
+
+===== Possible Solution
+
+. User requests (first) URL
+. *Server* fetches content for that URL
+. *Server* renders content to a response
+. User enjoys the content
+
+. in the meantime, the *client is initialized*
+
+. User nagivates to a different URL
+. *Client* fetches content for that URL
+. *Client* renders content to the DOM
+
+So, everytime a user makes an intial request to the app or an app path, the server should render the page and sends it to the client.
+From that moment on, the client can takeover control and proceed with rendering the content.
+This bridges the gap to initialize the client while the user can consume the intial server-side rendered page.
+Additionally, search engines get valid html with already rendered content if the want to index your site.
+And legacy browsers are also able to consume your site, if not only the client is able to render your pages.
+
 
 === React.js
 
-=== Spring Boot MVC
+http://reactjs.org[React.js^] is a *_JavaScript library for building user interfaces_*, invented by Facebook.
+It's not a full-stack client framework for building apps.
+In means of MVC or MVVM, React.js only reflects the *_V_*(iew) part.
 
-=== Java EE 8 MVC 1.0
+React is component based and has a virtual DOM. With this virtual DOM and building _diffs_, it's possible to have page/content transitions and updates without flickering.
+Additionally, React supports server-side rendering of templates.
+
+==== Flux
+
+For building full-stack apps with React, there's an architecture approach, called https://facebook.github.io/flux[Flux^].
+This architecture is a straight-forward approach and relies on immutable entities and collections.
+The state of the application is stored in a so called `Store`, the store represents the data for rendering the templates.
+The store may only be modified by a `Dispatcher`, which will get events (with data) from an `Actions`.
+Actions are the ones, who may communicate with the outside-world (e.g. service calls).
+
+image::flux.png[Flux Architecture]
+
+The currently most popular Flux implementation library is called http://redux.js.org/[Redux^].
+
+==== JSX
+
+React.js makes heavy use of https://jsx.github.io/[JSX^], a new JavaScript dialect, mixxed with HTML elements.
+_Perhaps it's a bit strange when using it first, but it comes handy while using it more and more._
+
+[source,javascript]
+.app.jsx
+----
+var Book = React.createClass({
+    render: function () {
+        return (
+            <div className="book">
+                <h3>{this.props.author}</h3>
+                <div className="lead">{this.props.children.toString()}</div>
+            </div>
+        );
+    }
+});
+----
+
+JSX will be transpiled (transformed) to executable JavaScript (ES5) by using https://babeljs.io[Babel.js^].
+(Formerlly this was done by `JSXTransformer`, a library from Facebook, but they switched to Babel, b/c it's more powerful.)
+
+[source,javascript]
+.app.js
+----
+var Book = React.createClass({displayName: "Book",
+    render: function () {
+        return (
+            React.createElement("div", {className: "book"},
+                React.createElement("h3", null, this.props.author),
+                React.createElement("div", {className: "lead"}, this.props.children.toString())
+            )
+        );
+    }
+});
+----
+
+At runtime, this JavaScript code will be rendered as proper HTML.
+
+[source,xml]
+.app.html
+----
+<div class="book" data-reactid=".1c3dv7jhtco.1.$0">
+    <h3 data-reactid=".1c3dv7jhtco.1.$0.0">George Orwell</h3>
+    <div class="lead" data-reactid=".1c3dv7jhtco.1.$0.1">1984</div>
+</div>
+----
+
+With the `data-reactid` attributes, React is able to locate the parts of the (virtual) DOM which have to be changed upon data change.
+
+
+NOTE: To learn more about React.js, JSX and Flux, please refer to their appropriate websites!
+
+
+=== Spring Boot MVC for Isomorphic Apps
+
+There are several demos using Spring (Boot) MVC and React.js for server-side rendering:
+
+* https://github.com/sdeleuze/spring-react-isomorphic[sdeleuze/spring-react-isomorphic^] +
+  by https://twitter.com/sdeleuze[Sébastien Deleuze^], Developer on the Spring Framework team at Pivotal, France
+
+* https://github.com/winterbe/spring-react-example[winterbe/spring-react-example^] +
+  by https://twitter.com/winterbe_[Benjamin Winterberg^], Developer from Germany
+
+NOTE: Please refer to these links, if you are more interested in building isomorphic applications with Spring MVC.
+
+=== Java EE 8 MVC 1.0 for Isomorphic Apps
+
+For the new to come _Action-based Web-Framework_ https://mvc-spec.java.net/[MVC 1.0^] in Java EE 8 and its reference implementation https://ozark.java.net/[Ozark^],
+I wrote a `ViewEngine` based on React.js, and also a working example, based on the React.js tutorial.
+
+* https://github.com/dasniko/ozark-react[dasniko/ozark-react^]
+* https://github.com/dasniko/ozark-react-example[dasniko/ozark-react-example^]
+
+The following, simplified code fragments are taken from the two above mentioned repositories to show, how an isomorphic JavaScript/Java EE application is realized.
+
+The `ReactController` is a standard MVC Controller, decorated with the new `@Controller` annotation.
+
+[source,java]
+.ReactController.java
+----
+@Controller<1>
+@Path("/react")
+public class ReactController {
+
+    @Inject
+    private Models models;<2>
+
+    @Inject
+    private BookService service;<3>
+
+    @GET
+    public String index() throws Exception {
+        List<Book> books = service.getBooks();
+        models.put("data", books);<4>
+        return "react:react.jsp";<5>
+    }
+
+}
+----
+<1> MVC Controller annotation
+<2> MVC internal models entity, just a `Map`
+<3> some service to retrieve (and store) data
+<4> get a `List` of books and put the Java representation into the models `Map`
+<5> return the path to the template to use, with the `react:` prefix we're saying that the `ReactViewEngine` should be used
+
+This is the actual `ViewEngine` implementation, interacting with React.js
+
+[source,java]
+.ReactViewEngine.java
+----
+public class ReactViewEngine extends ServletViewEngine {
+
+    private static final String viewPrefix = "react:";
+
+    @Inject
+    React react;<1>
+
+    ObjectMapper mapper = new ObjectMapper();
+
+    @Override
+    public boolean supports(String view) {<2>
+        return view.startsWith(viewPrefix);
+    }
+
+    @Override
+    public void processView(ViewEngineContext context) throws ViewEngineException {<3>
+        // parse view and extract the actual template
+        String template = context.getView().substring(viewPrefix.length());
+
+        // get "data" from model
+        Models models = context.getModels();
+        Object data = models.get("data");
+
+        // call js function on data to generate html
+        String content = react.render(data);
+
+        // and put results as string in model
+        models.put("content", content);
+        try {
+            // additionally put the data as JSON also to the model
+            // this overrides the List data stored previously under the same key
+            models.put("data", mapper.writeValueAsString(data));
+        } catch (JsonProcessingException e) {
+            throw new ViewEngineException(e);
+        }
+
+        // create a new context with the actual view and forward to ServletViewEngine
+        ViewEngineContext ctx = new ViewEngineContextImpl(template, models,
+                context.getRequest(), context.getResponse(), context.getUriInfo(),
+                context.getResourceInfo(), context.getConfiguration());
+
+        try {
+            forwardRequest(ctx, "*.jsp", "*.jspx");
+        } catch (ServletException | IOException e) {
+            throw new ViewEngineException(e);
+        }
+    }
+
+}
+----
+<1> The `React` clas will interact with the React.js JavaScript code, see next class for details.
+<2> The `supports()` method determines, if this class can be used as an appropriate `ViewEngine` for a return string of a controller.
+<3> The `processView()` method actually handles the things to process the view, see inline comments for details.
+
+The `React` class for interacting with React.js JavaScript code.
+
+[source,java]
+.React.java
+----
+public class React {
+
+    private ThreadLocal<ScriptEngine> engineHolder = ThreadLocal.withInitial(() -> {<1>
+        ScriptEngine nashorn = new ScriptEngineManager().getEngineByName("nashorn");
+        try {
+            nashorn.eval(read("/nashorn-polyfill.js"));
+            nashorn.eval(read("/META-INF/resources/webjars/react/0.14.2/react.min.js"));
+            nashorn.eval(read(
+                    "/META-INF/resources/webjars/showdown/0.3.1/compressed/showdown.js"));
+            nashorn.eval(read("/js/bookBox.js"));
+        } catch (ScriptException e) {
+            throw new RuntimeException(e);
+        }
+        return nashorn;
+    });
+
+    public String render(Object object) {<2>
+        try {
+            Object html =
+                    ((Invocable) engineHolder.get()).invokeFunction("renderServer", object);
+            return String.valueOf(html);
+        } catch (Exception e) {
+            throw new IllegalStateException("failed to render react component", e);
+        }
+    }
+
+    private Reader read(String path) {<3>
+        return new InputStreamReader(getClass().getClassLoader().getResourceAsStream(path));
+    }
+
+}
+----
+<1> initializes a new `ThreadLocal<ScriptEngine>` with all the needed JS libs, b/c React.js is not thread-safe, so we have to use a dedicated `ScriptEngine` in each request
+<2> call the `renderServer` function of our JSX/JS code and return the result as string (see next)
+<3> just a private class for reducing redundant code
+
+The original JSX code (which will be rendered to JS before loading it into Nashorn, this can be made during build, or at runtime loading the Babel.js library into the Nashorn `ScriptEngine`, but this may be lead to even longer load times).
+
+[source,javascript]
+.bookBox.jsx
+----
+...<1>
+
+var renderClient = function (books) {<2>
+    var data = books || [];
+    React.render(
+        <BookBox data={data} url='books.json' pollInterval={5000} />,
+        document.getElementById("content")
+    );
+};
+
+var renderServer = function (books) {<3>
+    var data = Java.from(books);
+    return React.renderToString(
+        <BookBox data={data} url='books.json' pollInterval={5000} />
+    );
+};
+----
+<1> there's of course more code before, but that isn't interesting for us at this point
+<2> this function will be called by the client to initialize the application and to render the content
+<3> this function will be called by the server (see above) to render the content
+
+The HTML skeleton, which will be enriched by the server-side rendered code and send to the client.
+
+[source,xml]
+.react.jsp
+----
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ReactJS Bookstore with Ozark</title>
+    <script src="${mvc.contextPath}/webjars/react/0.14.2/react.min.js"></script>
+    <script src="${mvc.contextPath}/webjars/showdown/0.3.1/compressed/showdown.js"></script>
+    <script src="${mvc.contextPath}/webjars/jquery/1.11.3/jquery.min.js"></script>
+    <link href="${mvc.contextPath}/webjars/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="content" class="container">${content}</div><1>
+    <script type="text/javascript" src="${mvc.contextPath}/js/bookBox.js"></script><2>
+    <script type="text/javascript">
+        $(function () {
+            renderClient(${data});<3>
+        });
+    </script>
+</body>
+</html>
+----
+<1> the `div` in which the rendered content will be put, regardless if client or server
+<2> the actual application script (see above)
+<3> the function which will be called, when the application is executed/initialized on the client-side (the function resides also in `bookBox.js`
+
+
+If the application is started, without calling the `ReactViewEngine` in `ReactController` (e.g. by returning only `"react.jsp"`, this yields in using the standard JSP ViewEngine),
+there will be no HTML code visible in the `<div id="content"/>` element if you look at the intial source code received from the server.
+But the content will nevertheless be rendered and displayed in the browser, because of the client-side function call to `renderClient()`.
+
+As soon the application uses the `ReactViewEngine`, you will see the rendered content also in the `<div id="content"/>` element, received as source code from the server.
+
+TIP: Use two different browsers and play with the application. Have a look at the application upating itself every 5 seconds and how the source code relates to these updates (or not).
+
