@@ -136,7 +136,7 @@ The state of the application is stored in a so called `Store`, the store represe
 The store may only be modified by a `Dispatcher`, which will get events (with data) from an `Actions`.
 Actions are the ones, who may communicate with the outside-world (e.g. service calls).
 
-image::flux.png[Flux Architecture]
+image::flux.png[caption="", title="The Flux Architecture Principle", alt="Flux Architecture"]
 
 The currently most popular Flux implementation library is called http://redux.js.org/[Redux^].
 
