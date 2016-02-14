@@ -217,6 +217,8 @@ I wrote a `ViewEngine` based on React.js, and also a working example, based on t
 
 The following, simplified code fragments are taken from the two above mentioned repositories to show, how an isomorphic JavaScript/Java EE application is realized.
 
+CAUTION: Ensure to use the original code from the above mentioned respository when building applications with a React-based ViewEngine. These are much more flexible and powerful than this simplified example!
+
 The `ReactController` is a standard MVC Controller, decorated with the new `@Controller` annotation.
 
 [source,java]
