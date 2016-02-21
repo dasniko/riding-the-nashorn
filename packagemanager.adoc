@@ -1,28 +1,129 @@
-== Working with Package Manager
+== Working with Package Managers & Repositories
+
+When working with Nashorn, you probably don't want to develop every function from scratch.
+There are already libraries which provide the functionalites you need.
+Just similar to using a dependency lib from Maven, you can use libraries with Nashorn.
+And more than that, you can choose out of various repositories and package managers,
+as there is Java, JavaScript and the perfect symbiosis of both.
 
 === NPM
 
-==== Polyfill.js
+**N**ode **P**ackage **M**anager - https://npmjs.org
 
-[source,javascript]
-.nashorn-polyfill.js
-----
-var global = this;
-var window = this;
-var process = {env:{}};
+- NPM is the _package manager_ of your choice when working with JavaScript only, no matter if for browser only or also server-side with Node.js.
+- The _NPM registry_ is a public collection of packages of open-source code.
+- NPM is also a _command line client_.
 
-var console = {};
-console.debug = print;
-console.warn = print;
-console.log = print;
-----
-
+You can use packages from NPM within Nashorn! _But_...
 
 
 ==== JVM-NPM
 
+Most/many packages rely on http://www.commonjs.org/[CommonJS] with the `require()` syntax (kind like an `import` in Java).
+As Nashorn is just a JavaScript engine, it doesn't have support for a package manager and/or a dependency loading mechanism.
+
+Luckily there is a project called https://github.com/nodyn/jvm-npm[npm-jvm] (a _NPM compliant CommonJS module loader for the JVM_),
+which brings the `require()` function to Nashorn. So it becomes possible to use packages which rely on CommonJS in Nashorn
+and also load other modules by using the `require()` function into your Nashorn script context.
+
+===== Usage
+
+Using the global `load()` function supplied by Nashorn to load `jvm-npm.js` into the global execution context.
+Then it's possible to load any module with `require()`:
+
+[source]
+----
+nashorn> load('./jvm-npm.js');
+nashorn> var x = require('some_module');
+----
+
+
+[small]#Alternatively there's also a project called https://github.com/walterhiggins/commonjs-modules-javax-script[commonjs-modules-javax-script] which should do similar things.#
+
+
+==== Polyfill.js
+
+Many libraries registered in NPM, make use of the Node.js and/or the common browser APIs.
+As Nashorn isn't Node.js nor a browser, we have to add some glue to make it work.
+This glue is called _polyfill_, to provide functions to a environment, where these functions aren't available by default.
+
+For most use cases, this `nashorn-polyfill.js` polyfill should work:
+
+[source,javascript]
+.nashorn-polyfill.js
+----
+var global = this;<1>
+var window = this;<2>
+var process = {env:{}};<3>
+
+var console = {};<4>
+console.debug = print;
+console.log = print;
+console.warn = print;
+console.error = print;
+----
+<1> Node.js has a `global` variable, which we have to provide - it's just the global context.
+<2> Browsers have a `window` variable, referring the global context, we have to provide it also.
+<3> Some packages make use of the `process.env` object of Node.js, as this is also not available, we just provide an empty object.
+<4> Nashorn doesn't have a `console` and arbitrary `log` statements, so we assign the `print` function to the most used/common console output functions.
+
+
+==== Native API access
+
+Nashorn doesn't have access to native language (C/C++) APIs. NPM packages using native APIs can't be used in Nashorn.
+
+There are discussions out in the wild, if it is possible to use Jython to run Python-based NPM packages inside the JVM,
+but I don’t know of any approach/project testing this.
+
+
 === Maven
+
+When using Nashorn within a Java project, it's obvious to use Maven as repository and package manager.
+This is possible without problems, but with a few plugins and helpers!
+
+==== Maven and NPM, Grunt, Gulp, etc.
+
+If you don't want to work without the Node.js ecosystem, NPM and frontend build tools like Grunt, Gulp and Webpack,
+there's a handy Maven plugin, which solves all your problems:
+
+https://github.com/eirslett/frontend-maven-plugin/
+
+Please refer to the GitHub page to get a detailed description and documentation of this plugin!
+
+==== WebJars
+
+Many of the most popular and most used NPM packages are provided as http://www.webjars.org/[WebJars].
+With WebJars, you can use NPM packages just as regular Maven dependencies in your project.
+
+Example for using http://momentjs.com/[Moment.js] as Maven dependency:
+
+[source,xml]
+----
+<dependency>
+    <groupId>org.webjars.npm</groupId>
+    <artifactId>moment</artifactId>
+    <version>2.11.2</version>
+</dependency>
+----
+
+If there is no WebJar of your favourite NPM package available, it's easy to create one.
+There's a http://www.webjars.org/contributing[detailed documentation on the website], how to do it.
+
 
 ==== Nasven
 
+https://github.com/nasven/nasven[Nasven.js] is a server, desktop, and shell-script application runtime for apps written in Javascript possibly dependent on Maven artifacts.
+
+[quote, 'https://twitter.com/lukaseder[Lukas Eder]']
+____
+Nasven = Nashorn + Maven. A tool to get Maven artifacts in scope for Nashorn script execution.
+____
+
+===== Some examples
+
+- https://github.com/nasven/samples/tree/master/jaxrs[JAX-RS]
+- https://github.com/nasven/samples/tree/master/camel[Apache Camel]
+
+---
+NOTE: Nearly everything what I wrote about Maven ist somehow available in similar ways/plugins for e.g. Gradle or any other popular build system. Just have a look around in the proper ecosystem!
 
