@@ -1,4 +1,4 @@
-= Riding the Nashorn
+= Riding the Nashorn: Programming JavaScript on the JVM
 Niko Köbler <niko@n-k.de, http://www.n-k.de, https://twitter.com/dasniko[@dasniko]>
 :toc: left
 :linkcss:
@@ -7,12 +7,16 @@ Niko Köbler <niko@n-k.de, http://www.n-k.de, https://twitter.com/dasniko[@dasni
 :icons: font
 :imagesdir: images
 :source-highlighter: coderay
+:doctype: book
+:keywords: javascript, java, jdk, nashorn
+:title-logo-image: image:nashorn.jpg[pdfwidth=5in]
+:pdf-page-size: A4
 
 Nashorn is the official JavaScript Engine in the Java Virtual Machine since Version 8.
 It supports and implements the http://www.ecma-international.org/ecma-262/5.1/[ECMAScript 5.1 specification] and competes among others directly with https://developers.google.com/v8/[Google V8] (the script enginge behind https://nodejs.org[Node.js]).
 Nashorn compiles JavaScript to Java Bytecode during runtime and thus provides high interoperability of Java and JavaScript.
 
-image::nashorn.jpg[Nashorn]
+image::nashorn.jpg[Nashorn, width="400" align="center"]
 
 In this script I want to dig into some of the (IMO) most used options, functions, features, and use-cases.
 After working through this tutorial you'll be able to use Nashorn and its dynamic scripting features in your daily Java business.

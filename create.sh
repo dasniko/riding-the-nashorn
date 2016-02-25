@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 mkdir -p $HOME/pages
 mkdir -p $HOME/pages/images
 BASEDIR=$(dirname $0)
