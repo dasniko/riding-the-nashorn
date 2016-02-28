@@ -1,1 +1,104 @@
 == JavaFX with JavaScript
+
+Nashorn comes with a special support for JavaFX.
+This support can be activated by using the `-fx` flag on the command-line when using `jjs`.
+Thus, no additional compile step for the scripted JavaFX and not additonal bootstrapping is needed!
+
+The `-fx` flag on `jjs` will bootstrap scripts using a `javafx.application.Application`.
+
+Let's assume this _"Hello World"_ example written in plain old Java code:
+
+[source,java]
+.HelloWorldFX.java
+----
+include::examples/HelloWorldFX.java[]
+----
+
+This is how it looks like in JavaScript:
+
+[source,javascript]
+.fxscript.js
+----
+include::examples/fxscript_1.js[]
+----
+
+Run the script with
+
+ $ jjs -fx fxscript.js
+
+
+As seen above, a JavaFX script application contains a `start()` function, which is equivalent to the `start()` method in its Java counterpart.
+It also can contain the `init()` and `stop()` functions.
+
+In Nashorn, the explicit usage of the `start()` function is optional.
+You can use the global `$STAGE` variable instead of the `stage` argument of the `start()` function, which is the primary stage.
+Thus, our script looks like this:
+
+[source,javascript]
+.fxscript.js
+----
+include::examples/fxscript_2.js[]
+----
+
+For further convenience, there are some predefined includes in the `fx:` namespace for all of the JavaFX classes.
+With these includes, our script now looks like this:
+
+[source,javascript]
+.fxscript.js
+----
+include::examples/fxscript_3.js[]
+----
+
+WARNING: It's highly recommended to use/add only the classes needed by the application.
+But it can be convenient for prototyping and during development, to have all the includes at hand.
+
+==== Complete list of includes
+
+[cols="1,1", options="header"]
+.FX Includes
+|===
+|Script
+|Includes
+
+|fx:base.js
+|javafx.stage.Stage +
+ javafx.scene.Scene +
+ javafx.scene.Group +
+ javafx/beans +
+ javafx/collections +
+ javafx/events +
+ javafx/util
+
+|fx:graphics.js
+|javafx/animation +
+ javafx/application +
+ javafx/concurrent +
+ javafx/css +
+ javafx/geometry +
+ javafx/print +
+ javafx/scene +
+ javafx/stage +
+
+|fx:controls.js
+|javafx/scene/chart +
+ javafx/scene/control
+
+|fx:fxml.js
+|javafx/fxml
+
+|fx:web.js
+|javafx/scene/web
+
+|fx:media.js
+|javafx/scene/media
+
+|fx:swing.js
+|javafx/embed/swing
+
+|fx:swt.js
+|javafx/embed/swt
+|===
+
+
+NOTE: Official Oracle documentation including some more examples: https://docs.oracle.com/javase/8/docs/technotes/guides/scripting/nashorn/javafx.html
+
