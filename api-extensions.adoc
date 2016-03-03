@@ -7,7 +7,7 @@ Let's have a look at some of the IMHO most useful and interessting ones.
 
 === Print Function
 
-Nashorn comes with a handy `print` function, which prints its arguments (after converting it to a string) to standard out:
+Nashorn comes with a handy `print` function, which prints its arguments (after converting it to a string) to standard out (`stdout`):
 
 [source,javascript]
 ----
@@ -15,7 +15,30 @@ print("Hello", "World");
 // Hello World
 ----
 
+NOTE: `echo()` is an equivalent to the `print()` function.
+
 WARNING: Nashorn does not have a `console` object, where browsers do logging!
+
+=== Reading Stdin
+
+If you want to read from the `stdin`, there's the `readLine()` function:
+
+[source,javascript]
+----
+jjs> var name = readLine("What is your name? ")
+What is your name? John
+jjs> print("Hello, ${name}!")
+Hello, John!
+----
+
+=== Reading Files
+
+If `stdin` is just not enough, you can use `readFully()` to read complete file contents into a variable:
+
+[source,javascript]
+----
+var content = readFully('text.txt');
+----
 
 === String Interpolation
 
