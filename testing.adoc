@@ -2,7 +2,7 @@
 
 === Testing
 
-Testing of Nashorn scripts is not that hard as it may look like if you're not used to it.
+Testing of Nashorn scripts is not that hard as it may look like when you're not yet used to it.
 
 
 ==== Function(al) testing with JUnit
@@ -14,7 +14,7 @@ Then, you can just call a JS function in your test and assert the result.
 Let's assume we have the following JavaScript code:
 
 [source,javascript]
-.calc.js
+.calculator.js
 ----
 var add = function(a, b) {
     return a + b;
@@ -38,7 +38,7 @@ public class CalculatorTest {
     public void setup() {
         nashorn = new ScriptEngineManager().getEngineByName("nashorn");
         nashorn.eval(new InputStreamReader(
-                getClass().getClassLoader().getResourceAsStream("/calc.js")));
+                getClass().getClassLoader().getResourceAsStream("/calculator.js")));
     }
 
     @Test

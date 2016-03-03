@@ -4,6 +4,7 @@
 === What does _Isomorphic_ mean, what can I do with it and why should I use it?
 
 Isomorphic comes from the Greek _"isos"_ for _"equal"_ and _"morph"_ for _"shape"_.
+So, it's about the _same_ or _equal shape_ of something.
 
 [quote, 'http://isomorphic.net/javascript']
 ____
@@ -42,7 +43,7 @@ function isPasswordValid(password) {
 ----
 
 This works pretty well, but to prevent that users disable JavaScript in the browser and pass an invalid password to the server,
-you'll have to develp the same logic again the programming language used on the server, perhaps Java.
+you'll have to develop the same logic again in the programming language used on the server, perhaps Java.
 This is additional effort, can lead to implementation errors, something may be forgotten in implementation, latest on maintenance.
 _Why not re-use the above logic in your Java code?_
 
@@ -75,29 +76,29 @@ which render the whole application UI and is responsible for all transitions, pa
 </html>
 ----
 
-These applications are (mostyl) awesome, but have some drawbacks:
+These applications are (mostly) awesome, but have some drawbacks:
 
 ===== Cons
 
 . *UX / Performance* - The user doesn't see anything before the whole script code is loaded, evaluated and executed on the client/browser.
 .. Long wait time, even on fast internet connections.
 .. Users will possibly go away (3sec. rule!).
-.. Think of slow internet connections!
+.. Think of slow internet connections!?
 . *Legacy Browsers* (and there are still a lot out there!) can't evaluate your fancy new JavaScript stuff.
 . *SEO* - Search engines can't index your website, because there is no content!
-.. Even if Google can now evaluate JavaScript on websites, it's still error-prone and a mess!
+.. Even if Google can now evaluate JavaScript on websites, it's still error-prone, a mess and you can't rely on proper evaluation!
 
-So, perhaps it's better to render the web pages on the server?
+So, perhaps it's better to render the web pages _on the server!?_
 
 ===== Pros
 
 But what about
 
-* *UX* - cool transition effects
+* *UX* - cool transition effects _(which are required nowadays to be able to compete on the market!)_
 * *Performance* - faster rendering of only parts/fragments of the entire page
 * *Performance* - only send the needed data over the wire, instead of the whole html page
 
-These advantages can only be achieved by running the application and rendering the pages on the client!
+These advantages can only be achieved by running the application and rendering the pages _on the client!_
 
 ===== Possible Solution
 
@@ -115,7 +116,7 @@ These advantages can only be achieved by running the application and rendering t
 So, everytime a user makes an intial request to the app or an app path, the server should render the page and sends it to the client.
 From that moment on, the client can takeover control and proceed with rendering the content.
 This bridges the gap to initialize the client while the user can consume the intial server-side rendered page.
-Additionally, search engines get valid html with already rendered content if the want to index your site.
+Additionally, search engines get valid html with already rendered content if they want to index your site.
 And legacy browsers are also able to consume your site, if not only the client is able to render your pages.
 
 
@@ -133,12 +134,12 @@ Additionally, React supports server-side rendering of templates.
 For building full-stack apps with React, there's an architecture approach, called https://facebook.github.io/flux[Flux^].
 This architecture is a straight-forward approach and relies on immutable entities and collections.
 The state of the application is stored in a so called `Store`, the store represents the data for rendering the templates.
-The store may only be modified by a `Dispatcher`, which will get events (with data) from an `Actions`.
-Actions are the ones, who may communicate with the outside-world (e.g. service calls).
+The store may only be modified by a `Dispatcher`, which will get events (with data) from an `Action`.
+Actions are the (only) ones, who may/should communicate with the outside-world (e.g. service calls).
 
 image::flux.png[caption="", title="The Flux Architecture Principle", alt="Flux Architecture"]
 
-The currently most popular Flux implementation library is called http://redux.js.org/[Redux^].
+The currently most popular Flux implementation library is called http://redux.js.org/[Redux^], but there are a lot of others, too.
 
 ==== JSX
 
@@ -160,6 +161,8 @@ var Book = React.createClass({
 });
 ----
 
+_(Some people might be remembered on JSP when reading the code above...)_
+
 JSX will be transpiled (transformed) to executable JavaScript (ES5) by using https://babeljs.io[Babel.js^].
 (Formerlly this was done by `JSXTransformer`, a library from Facebook, but they switched to Babel, b/c it's more powerful.)
 
@@ -178,7 +181,7 @@ var Book = React.createClass({displayName: "Book",
 });
 ----
 
-At runtime, this JavaScript code will be rendered as proper HTML.
+At runtime, this JavaScript code will be rendered to proper HTML.
 
 [source,xml]
 .app.html
@@ -215,7 +218,7 @@ I wrote a `ViewEngine` based on React.js, and also a working example, based on t
 * https://github.com/dasniko/ozark-react[dasniko/ozark-react^]
 * https://github.com/dasniko/ozark-react-example[dasniko/ozark-react-example^]
 
-The following, simplified code fragments are taken from the two above mentioned repositories to show, how an isomorphic JavaScript/Java EE application is realized.
+The following, simplified(!) code fragments are taken from the two above mentioned repositories to show, how an isomorphic JavaScript/Java EE application is realized.
 
 CAUTION: Ensure to use the original code from the above mentioned respository when building applications with a React-based ViewEngine. These are much more flexible and powerful than this simplified example!
 
@@ -359,7 +362,7 @@ The original JSX code (which will be rendered to JS before loading it into Nasho
 var renderClient = function (books) {<2>
     var data = books || [];
     React.render(
-        <BookBox data={data} url='books.json' pollInterval={5000} />,
+        <BookBox data={data} url='books.json' pollInterval={5000} />,<4>
         document.getElementById("content")
     );
 };
@@ -367,15 +370,16 @@ var renderClient = function (books) {<2>
 var renderServer = function (books) {<3>
     var data = Java.from(books);
     return React.renderToString(
-        <BookBox data={data} url='books.json' pollInterval={5000} />
+        <BookBox data={data} url='books.json' pollInterval={5000} /><4>
     );
 };
 ----
-<1> there's of course more code before, but that isn't interesting for us at this point
+<1> there's of course more code before, but that's not interesting for us at this point
 <2> this function will be called by the client to initialize the application and to render the content
 <3> this function will be called by the server (see above) to render the content
+<4> the `<BookBox/>` component is the code from <1>, which is ommitted here, but the actual isomorphic code!
 
-The HTML skeleton, which will be enriched by the server-side rendered code and send to the client.
+The HTML skeleton, which will be enriched by the server-side rendered code, and send to the client.
 
 [source,xml]
 .react.jsp
@@ -388,33 +392,35 @@ The HTML skeleton, which will be enriched by the server-side rendered code and s
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ReactJS Bookstore with Ozark</title>
-    <script src="${mvc.contextPath}/webjars/react/0.14.2/react.min.js"></script>
+    <script src="${mvc.contextPath}/webjars/react/0.14.2/react.min.js"></script><1>
     <script src="${mvc.contextPath}/webjars/showdown/0.3.1/compressed/showdown.js"></script>
     <script src="${mvc.contextPath}/webjars/jquery/1.11.3/jquery.min.js"></script>
     <link href="${mvc.contextPath}/webjars/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
 </head>
 
 <body>
-    <div id="content" class="container">${content}</div><1>
-    <script type="text/javascript" src="${mvc.contextPath}/js/bookBox.js"></script><2>
+    <div id="content" class="container">${content}</div><2>
+    <script type="text/javascript" src="${mvc.contextPath}/js/bookBox.js"></script><3>
     <script type="text/javascript">
         $(function () {
-            renderClient(${data});<3>
+            renderClient(${data});<4>
         });
     </script>
 </body>
 </html>
 ----
-<1> the `div` in which the rendered content will be put, regardless if client or server
-<2> the actual application script (see above)
-<3> the function which will be called, when the application is executed/initialized on the client-side (the function resides also in `bookBox.js`
+<1> JS libraries referenced as WebJars (dependency specified in Maven/Gradle build file)
+<2> the `div` in which the rendered content will be put, regardless if client or server
+<3> the actual application script (see above)
+<4> the function which will be called, when the application is executed/initialized on the client-side (the function resides also in `bookBox.js`
 
 
-If the application is started, without calling the `ReactViewEngine` in `ReactController` (e.g. by returning only `"react.jsp"`, this yields in using the standard JSP ViewEngine),
+If the application is started without calling the `ReactViewEngine` in `ReactController` (e.g. by returning only `"react.jsp"`, this yields in using the standard JSP ViewEngine),
 there will be no HTML code visible in the `<div id="content"/>` element if you look at the intial source code received from the server.
 But the content will nevertheless be rendered and displayed in the browser, because of the client-side function call to `renderClient()`.
 
 As soon the application uses the `ReactViewEngine`, you will see the rendered content also in the `<div id="content"/>` element, received as source code from the server.
 
-TIP: Use two different browsers and play with the application. Have a look at the application upating itself every 5 seconds and how the source code relates to these updates (or not).
+The client-side execution of `renderClient()` is also performed, but as there is no change to the (virtual) DOM, the page stays as it is, there's no re-rendering of DOM elements (and thus no flickering).
 
+TIP: Use two different browsers and play with the application. Have a look at the application upating itself every 5 seconds and how the source code relates to these updates (or not).

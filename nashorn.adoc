@@ -5,17 +5,18 @@ So, for being able to evaluate JavaScript code from Java, we just create a new N
 
 [source,java]
 ----
-ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");<1>
 engine.eval("print('Hello World');");
 ----
+<1> The Nashorn engine names you can use here are _"nashorn"_, "javascript"_ and _"js"_.
 
 As seen above, JavaScript code can be evaluated directly by passing it as a string to the `eval()` method of the engine object.
-Alternatively you can parse a `.js`-file by passing a `FileReader` object pointing to your file:
+Alternatively you can parse (and evaluate) a `.js`-file by passing a `FileReader` object pointing to your file:
 
 [source,java]
 ----
 ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-engine.eval(new FileReader('test.js'));
+engine.eval(new FileReader("test.js"));
 ----
 
 
@@ -41,8 +42,9 @@ The `Invocable` interface provides the `invokeFunktion()` method, which allows t
 [source,java]
 ----
 ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-engine.eval(new FileReader('example.js'));
+engine.eval(new FileReader("example.js"));
 
+// cast the script engine to an invocable instance
 Invocable invocable = (Invocable) engine;
 
 Object result = invocable.invokeFunction("sayHello", "John Doe");
@@ -87,9 +89,11 @@ Since the `sayHello()` method is static, we don't have to create an instance as 
 ----
 var MyJavaClass = Java.type('my.package.MyJavaClass');
 
+// call the static method
 var greetingResult = MyJavaClass.sayHello('John Doe');
 print(greetingResult);
 
+// create a new intance of MyJavaClass
 var myClass = new MyJavaClass();
 var calcResult = myClass.add(1, 2);
 print(calcResult);
@@ -114,7 +118,7 @@ Now, call this static method with different JavaScript types:
 
 [source,javascript]
 ----
-MyJavaClass.printType("Hello");
+MyJavaClass.printType('Hello');
 // class java.lang.String
 
 MyJavaClass.printType(123);
@@ -196,7 +200,7 @@ function Person(firstName, lastName) {
   this.firstName = firstName;
   this.lastName = lastName;
   this.getFullName = function() {
-    return this.firstName + " " + this.lastName;
+    return this.firstName + ' ' + this.lastName;
   }
 }
 ----
@@ -241,7 +245,7 @@ NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
 ScriptEngine engine = factory.getScriptEngine(new String[] { "-scripting" });
 ----
 
-NOTE: Available options can be determined from the link:#_nashorn_at_the_command_line_interface_cli[command line] when calling `jjs -help`.
+TIP: Available options can be determined from the link:#_nashorn_at_the_command_line_interface_cli[command line] when calling `jjs -help`.
 
 
 === Bindings / Context

@@ -2,7 +2,7 @@
 
 Nashorn comes with a command line client named `jjs`.
 
-This client is located in `$JAVA_HOME/bin`, but there's no shortcut/link/path integration after installation Java 8.
+This client is located in `$JAVA_HOME/bin`, but there's no shortcut/link/path integration after installation of Java 8.
 So, if you want to work with `jjs` - and that's what we want to do here - you should create a link to the tool:
 
 [source,bash]
@@ -44,11 +44,11 @@ The `jjs` client can be exited by calling
 
 [source,js]
 ----
-jjs> exit()
-jjs> exit(1)
+jjs> exit()  // regular exit
+jjs> exit(1) // exit with an exit-code
 
-jjs> quit()
-jjs> quit(1)
+jjs> quit()  // regular exit
+jjs> quit(1) // exit with an exit-code
 ----
 
 *Help / Options*
@@ -99,7 +99,7 @@ print('hello');
 $ jjs test.js
 ----
 
-Just write your JavaScript file like the following with a shebang at first line:
+Just write your JavaScript file like the following with a _shebang_ at first line:
 
 [source,js]
 .test.js

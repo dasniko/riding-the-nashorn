@@ -2,7 +2,7 @@
 
 Nashorn comes with a special support for JavaFX.
 This support can be activated by using the `-fx` flag on the command-line when using `jjs`.
-Thus, no additional compile step for the scripted JavaFX and not additonal bootstrapping is needed!
+Thus, no additional compile step for the scripted JavaFX and no additonal bootstrapping is needed!
 
 The `-fx` flag on `jjs` will bootstrap scripts using a `javafx.application.Application`.
 
@@ -14,7 +14,7 @@ Let's assume this _"Hello World"_ example written in plain old Java code:
 include::examples/HelloWorldFX.java[]
 ----
 
-This is how it looks like in JavaScript:
+This is how it looks like in Nashorn JavaScript:
 
 [source,javascript]
 .fxscript.js
@@ -52,7 +52,7 @@ include::examples/fxscript_3.js[]
 WARNING: It's highly recommended to use/add only the classes needed by the application.
 But it can be convenient for prototyping and during development, to have all the includes at hand.
 
-==== Complete list of includes
+=== List of includes
 
 [cols="1,1", options="header"]
 .FX Includes

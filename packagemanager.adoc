@@ -20,7 +20,7 @@ You can use packages from NPM within Nashorn! _But_...
 ==== JVM-NPM
 
 Most/many packages rely on http://www.commonjs.org/[CommonJS] with the `require()` syntax (kind like an `import` in Java).
-As Nashorn is just a JavaScript engine, it doesn't have support for a package manager and/or a dependency loading mechanism.
+As Nashorn is just a JavaScript engine, it unfortunately doesn't have support for a package manager and/or a dependency loading mechanism.
 
 Luckily there is a project called https://github.com/nodyn/jvm-npm[npm-jvm] (a _NPM compliant CommonJS module loader for the JVM_),
 which brings the `require()` function to Nashorn. So it becomes possible to use packages which rely on CommonJS in Nashorn
@@ -45,7 +45,7 @@ nashorn> var x = require('some_module');
 
 Many libraries registered in NPM, make use of the Node.js and/or the common browser APIs.
 As Nashorn isn't Node.js nor a browser, we have to add some glue to make it work.
-This glue is called _polyfill_, to provide functions to a environment, where these functions aren't available by default.
+This glue is called _polyfill_, to provide functions to an environment, where these functions aren't available by default.
 
 For most use cases, this `nashorn-polyfill.js` polyfill should work:
 
@@ -72,7 +72,7 @@ console.error = print;
 
 Nashorn doesn't have access to native language (C/C++) APIs. NPM packages using native APIs can't be used in Nashorn.
 
-There are discussions out in the wild, if it is possible to use Jython to run Python-based NPM packages inside the JVM,
+NOTE: There are discussions out in the wild, if it is possible to use http://www.jython.org[Jython] to run Python-based NPM packages inside the JVM,
 but I don’t know of any approach/project testing this.
 
 
@@ -107,7 +107,7 @@ Example for using http://momentjs.com/[Moment.js] as Maven dependency:
 ----
 
 If there is no WebJar of your favourite NPM package available, it's easy to create one.
-There's a http://www.webjars.org/contributing[detailed documentation on the website], how to do it.
+There's a http://www.webjars.org/contributing[detailed documentation on the website], on how to do it.
 
 
 ==== Nasven
@@ -118,6 +118,17 @@ https://github.com/nasven/nasven[Nasven.js] is a server, desktop, and shell-scri
 ____
 Nasven = Nashorn + Maven. A tool to get Maven artifacts in scope for Nashorn script execution.
 ____
+
+[source,bash]
+----
+$ nasven package.json
+nashorn full version 1.8.0_72-b15
+[NASVEN] Building temporary Apache Maven project to find dependencies ...
+[NASVEN] Done!
+[NASVEN] About to run your nasven.js application under /Users/Niko/nasven/nasven-samples/camel/index.js ...
+
+[NASVEN] Calling jjs for your application ...
+----
 
 ===== Some examples
 

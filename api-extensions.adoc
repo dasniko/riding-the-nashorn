@@ -1,6 +1,8 @@
 == API and Language Extensions
 
 Nashorn comes along with quite a few language and API extensions, additionally to the ECMAScript standard.
+Most of the API extensions exist due to backward compatibility to Rhino.
+
 Let's have a look at some of the IMHO most useful and interessting ones.
 
 === Print Function
@@ -13,6 +15,8 @@ print("Hello", "World");
 // Hello World
 ----
 
+WARNING: Nashorn does not have a `console` object, where browsers do logging!
+
 === String Interpolation
 
 You can specify expressions inside string literals with the `${expression}` syntax.
@@ -21,7 +25,7 @@ The string value is computed by substituting the name of the `${expr}` expressio
 [source,javascript]
 ----
 var name = "World";
-var str = "Hello, %{name}!";
+var str = "Hello, ${name}!";
 print(str);
 // Hello, World!
 ----
@@ -41,6 +45,8 @@ for (var l in lines) {
 }
 ----
 
+CAUTION: Don't mix this up with the new back quote string templates in ES6, they are similar to String interpolation mentioned above!
+
 === Java Beans
 
 With Nashorn, you get direct access to the properties of a Java bean, no need to use getters and setters anymore:
@@ -49,8 +55,9 @@ With Nashorn, you get direct access to the properties of a Java bean, no need to
 ----
 var Date = Java.type('java.util.Date');
 var date = new Date();
-date.year += 1900;
-print(date.year);  // 2015
+date.year += 1900; // -> no setter!
+print(date.year);  // -> no getter!
+// 2016
 ----
 
 === Function Literals
@@ -60,6 +67,7 @@ For simple, one-line functions, we don't necessarily have to use curly braces (a
 [source,javascript]
 ----
 function add(a, b) a + b;
+
 print(add(1, 2);  // 3
 ----
 
@@ -130,6 +138,8 @@ var JFrame = javax.swing.JFrame;  // javax == Packages.javax
 var List = java.util.List;        // java == Packages.java
 ----
 
+Let's test it in `jjs`:
+
 [source,bash]
 ----
 jjs> Packages.java
@@ -153,12 +163,12 @@ For example, create an array of `int` 's:
 
 [source,javascript]
 ----
-var IntArray = Java.type("int[]");
+var IntArray = Java.type('int[]');
 
 var array = new IntArray(3);
-var array[0] = 3;
-var array[1] = 2;
-var array[2] = 1;
+array[0] = 3;
+array[1] = 2;
+array[2] = 1;
 
 try {
     array[3] = 0;  // would be possible in pure JS
@@ -166,13 +176,13 @@ try {
     print(e.message);  // Array index out of range: 3
 }
 
-array[0] = "42";
+array[0] = '42';
 print(array[0]);  // 42
 
-array[0] = "some wrong type";
+array[0] = 'some wrong type';
 print(array[0]);  // 0
 
-array[0] = "3.14";
+array[0] = '3.14';
 print(array[0]);  // 3
 ----
 
@@ -182,7 +192,8 @@ Strings will automatically be converted to `int`, if possible.
 
 === Collections and For-Each
 
-Array handling in JavaScript is sometimes annoying. Let's use Java collections instead!
+Array handling in JavaScript is sometimes annoying. Let's use Java collections instead! +
+_(BTW: this has become much better with ES6)_
 
 [source,javascript]
 ----
@@ -217,9 +228,9 @@ Some packages like `java.util` (and `java.lang`) can be accessed directly withou
 [source,javascript]
 ----
 var list = new java.util.ArrayList();
-list.add("John");
-list.add("Jack");
-list.add("Joe");
+list.add('John');
+list.add('Jack');
+list.add('Joe');
 ----
 
 This code converts the Java list to a native JavaScript array:
@@ -242,36 +253,36 @@ var javaArray = Java.to([1, 2, 3, 5, 8, 13], "int[]");
 
 As Lambdas and Streams are available since Java 8, it's also possible to work with them in Nashorn! \o/
 
-Although ECMAScript 5.1 lacks the compact arrow syntax from the Java 8 lambda expressions, we can use function literals where ever lambda expressions are accepted.
+Although ECMAScript 5.1 lacks the _compact arrow syntax_ from the Java 8 lambda expressions, we can use function literals where ever lambda expressions are accepted.
 
 [source,javascript]
 ----
 var list = new java.util.ArrayList();
-list.add("a1");
-list.add("b1");
-list.add("c1");
-list.add("a3");
-list.add("b3");
-list.add("c3");
-list.add("a2");
-list.add("b2");
-list.add("c2");
+list.add('a1');
+list.add('b1');
+list.add('c1');
+list.add('a3');
+list.add('b3');
+list.add('c3');
+list.add('a2');
+list.add('b2');
+list.add('c2');
 
 list
     .stream()
-    .filter(function(e) {
-        return e.startsWith("b");
+    .filter(function(entry) {
+        return entry.startsWith('a');
     })
     .sorted()
-    .forEach(function(e) {
-        print(e);
+    .forEach(function(entry) {
+        print(entry);
     });
 // a1, a2, a3
 ----
 
 TIP: Where ever a Java 8 Lambda or SAM (single-abstract-method) type is required, an ECMAScript function can be passed as argument!
 
-==== Every Lambda is a Script Function
+==== Every Lambda is a JavaScript Function
 
 Any Java object that is an instance of lambda type can be treated like a script function.
 
@@ -318,7 +329,7 @@ TIP: As you can see, even multi-threaded code is possible in Nashorn.
 === Calling Super
 
 Accessing overridden members in JavaScript is traditionally awkward because Javas `super` keyword doesn't exist in ECMAScript.
-Luckily nashorn goes to the rescue.
+Luckily nashorn comes to the rescue.
 
 First we define a super type in java code:
 
@@ -357,7 +368,7 @@ We call the overridden method `SuperRunner.run()` by utilizing the `Java.super` 
 
 === Loading Scripts
 
-Loading and evaluating additional script files from Nashorn JavaScript is quite easy with the `load` function.
+Loading and evaluating additional script files from Nashorn is quite easy with the `load` function.
 We can load local and external files.
 
 In our example, we load the http://momentjs.com/[moment.js] library to calculate some dates and times:
@@ -400,13 +411,14 @@ function f() {
 }
 
 try {
-    f()
+    f();
 } catch (e) {
     print(e.stack);
     print(e.lineNumber);
     print(e.columnNumber);
     print(e.fileName);
 
+    // of course, also this is possible
     e.printStackTrace();
 }
 ----
@@ -425,6 +437,17 @@ $ jjs -scripting -- arg1 arg2 arg3
 jjs> $ARG
 arg1,arg2,arg3
 jjs> $ARG[1]
+arg2
+----
+
+===== arguments
+
+[source-bash]
+----
+$ jjs -scripting -- arg1 arg2 arg3
+jjs> arguments
+arg1,arg2,arg3
+jjs> arguments[1]
 arg2
 ----
 
