@@ -34,4 +34,5 @@ include::packagemanager.adoc[]
 include::isomorphic.adoc[]
 include::javafx.adoc[]
 include::testing.adoc[]
+include::contact.adoc[]
 
