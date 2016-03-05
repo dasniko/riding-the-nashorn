@@ -424,3 +424,4 @@ As soon the application uses the `ReactViewEngine`, you will see the rendered co
 The client-side execution of `renderClient()` is also performed, but as there is no change to the (virtual) DOM, the page stays as it is, there's no re-rendering of DOM elements (and thus no flickering).
 
 TIP: Use two different browsers and play with the application. Have a look at the application upating itself every 5 seconds and how the source code relates to these updates (or not).
+
