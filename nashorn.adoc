@@ -110,7 +110,7 @@ With this little example, you can find out, how Nashorn handles type conversions
 [source,java]
 ----
 public static void printType(Object object) {
-    System.out.println((object.getClass());
+    System.out.println(object.getClass());
 }
 ----
 
