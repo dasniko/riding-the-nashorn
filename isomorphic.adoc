@@ -149,8 +149,8 @@ _Perhaps it's a bit strange when using it first, but it comes handy while using 
 [source,javascript]
 .app.jsx
 ----
-var Book = React.createClass({
-    render: function () {
+class Book extends React.Component {
+    render() {
         return (
             <div className="book">
                 <h3>{this.props.author}</h3>
@@ -158,7 +158,7 @@ var Book = React.createClass({
             </div>
         );
     }
-});
+}
 ----
 
 _(Some people might be remembered on JSP when reading the code above...)_
@@ -350,7 +350,7 @@ public class React {
 ----
 <1> initializes a new `ThreadLocal<ScriptEngine>` with all the needed JS libs, b/c React.js is not thread-safe, so we have to use a dedicated `ScriptEngine` in each request
 <2> call the `renderServer` function of our JSX/JS code and return the result as string (see next)
-<3> just a private class for reducing redundant code
+<3> just a private method for reducing redundant code
 
 The original JSX code (which will be rendered to JS before loading it into Nashorn, this can be made during build, or at runtime loading the Babel.js library into the Nashorn `ScriptEngine`, but this may be lead to even longer load times).
 
