@@ -8,7 +8,7 @@ Testing of Nashorn scripts is not that hard as it may look like when you're not 
 ==== Function(al) testing with JUnit
 
 Because every JavaScript function has a return value (yes, every JavaScript function, even functions which have no explicit return value will return `undefined`), these values can be asserted.
-Just built up your JavaScript file properly and working with testable, independend, hopefully atomic, functions, just as you would develop your Java methods.
+Just build up your JavaScript file properly and working with testable, independent, hopefully atomic, functions, just as you would develop your Java methods.
 Then, you can just call a JS function in your test and assert the result.
 
 Let's assume we have the following JavaScript code:
@@ -131,5 +131,5 @@ Debugging of Nashorn JavaScript is supported by major IDEs like
 ** https://blogs.oracle.com/sundararajan/entry/remote_debugging_of_nashorn_scripts
 * *Eclipse*
 ** should be possible with https://github.com/Nodeclipse/nodeclipse-1[Nodeclipse]
-** _(no further info available, as I'm not an Eclipse user anymore...)_
+** _(no further info available, as I'm not an Eclipse user any more...)_
 

@@ -1,8 +1,8 @@
 == Working with Package Managers & Repositories
 
 When working with Nashorn, you probably don't want to develop every function from scratch.
-There are already libraries which provide the functionalites you need.
-Just similar to using a dependency lib from Maven, you can use libraries with Nashorn.
+There are already libraries which provide the functionalities you need.
+Just like using a dependency lib from Maven, you can use libraries with Nashorn.
 And more than that, you can choose out of various repositories and package managers,
 as there is Java, JavaScript and the perfect symbiosis of both.
 
@@ -10,7 +10,7 @@ as there is Java, JavaScript and the perfect symbiosis of both.
 
 **N**ode **P**ackage **M**anager - https://npmjs.org
 
-- NPM is the _package manager_ of your choice when working with JavaScript only, no matter if for browser only or also server-side with Node.js.
+- NPM is the _package manager_ of choice when working with JavaScript only, no matter if for browser only or also server-side with Node.js.
 - The _NPM registry_ is a public collection of packages of open-source code.
 - NPM is also a _command line client_.
 
@@ -136,5 +136,5 @@ nashorn full version 1.8.0_72-b15
 - https://github.com/nasven/samples/tree/master/camel[Apache Camel]
 
 ---
-NOTE: Nearly everything what I wrote about Maven ist somehow available in similar ways/plugins for e.g. Gradle or any other popular build system. Just have a look around in the proper ecosystem!
+NOTE: Nearly everything that I wrote about Maven is somehow available in similar ways/plugins for e.g. Gradle or any other popular build system. Just have a look around in the proper ecosystem!
 

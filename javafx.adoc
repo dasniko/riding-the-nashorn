@@ -2,7 +2,7 @@
 
 Nashorn comes with a special support for JavaFX.
 This support can be activated by using the `-fx` flag on the command-line when using `jjs`.
-Thus, no additional compile step for the scripted JavaFX and no additonal bootstrapping is needed!
+Thus, no additional compile step for the scripted JavaFX and no additional bootstrapping is needed!
 
 The `-fx` flag on `jjs` will bootstrap scripts using a `javafx.application.Application`.
 

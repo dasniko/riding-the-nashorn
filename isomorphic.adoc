@@ -113,9 +113,9 @@ These advantages can only be achieved by running the application and rendering t
 . *Client* fetches content for that URL
 . *Client* renders content to the DOM
 
-So, everytime a user makes an intial request to the app or an app path, the server should render the page and sends it to the client.
-From that moment on, the client can takeover control and proceed with rendering the content.
-This bridges the gap to initialize the client while the user can consume the intial server-side rendered page.
+So, every time a user makes an intial request to the app or an app path, the server should render the page and send it to the client.
+From that moment on, the client can take over control and proceed with rendering the content.
+This bridges the gap to initialize the client while the user can consume the initial server-side rendered page.
 Additionally, search engines get valid html with already rendered content if they want to index your site.
 And legacy browsers are also able to consume your site, if not only the client is able to render your pages.
 
@@ -143,7 +143,7 @@ The currently most popular Flux implementation library is called http://redux.js
 
 ==== JSX
 
-React.js makes heavy use of https://jsx.github.io/[JSX^], a new JavaScript dialect, mixxed with HTML elements.
+React.js makes heavy use of https://jsx.github.io/[JSX^], a new JavaScript dialect, mixed with HTML elements.
 _Perhaps it's a bit strange when using it first, but it comes handy while using it more and more._
 
 [source,javascript]
@@ -161,10 +161,10 @@ class Book extends React.Component {
 }
 ----
 
-_(Some people might be remembered on JSP when reading the code above...)_
+_(Some people might be reminded of JSP when reading the code above...)_
 
 JSX will be transpiled (transformed) to executable JavaScript (ES5) by using https://babeljs.io[Babel.js^].
-(Formerlly this was done by `JSXTransformer`, a library from Facebook, but they switched to Babel, b/c it's more powerful.)
+(Formerly this was done by `JSXTransformer`, a library from Facebook, but they switched to Babel, b/c it's more powerful.)
 
 [source,javascript]
 .app.js
@@ -220,7 +220,7 @@ I wrote a `ViewEngine` based on React.js, and also a working example, based on t
 
 The following, simplified(!) code fragments are taken from the two above mentioned repositories to show, how an isomorphic JavaScript/Java EE application is realized.
 
-CAUTION: Ensure to use the original code from the above mentioned respository when building applications with a React-based ViewEngine. These are much more flexible and powerful than this simplified example!
+CAUTION: Ensure to use the original code from the above mentioned repository when building applications with a React-based ViewEngine. These are much more flexible and powerful than this simplified example!
 
 The `ReactController` is a standard MVC Controller, decorated with the new `@Controller` annotation.
 
@@ -307,7 +307,7 @@ public class ReactViewEngine extends ServletViewEngine {
 
 }
 ----
-<1> The `React` clas will interact with the React.js JavaScript code, see next class for details.
+<1> The `React` class will interact with the React.js JavaScript code, see next class for details.
 <2> The `supports()` method determines, if this class can be used as an appropriate `ViewEngine` for a return string of a controller.
 <3> The `processView()` method actually handles the things to process the view, see inline comments for details.
 
@@ -377,7 +377,7 @@ var renderServer = function (books) {<3>
 <1> there's of course more code before, but that's not interesting for us at this point
 <2> this function will be called by the client to initialize the application and to render the content
 <3> this function will be called by the server (see above) to render the content
-<4> the `<BookBox/>` component is the code from <1>, which is ommitted here, but the actual isomorphic code!
+<4> the `<BookBox/>` component is the code from <1>, which is omitted here, but the actual isomorphic code!
 
 The HTML skeleton, which will be enriched by the server-side rendered code, and send to the client.
 
@@ -416,12 +416,12 @@ The HTML skeleton, which will be enriched by the server-side rendered code, and 
 
 
 If the application is started without calling the `ReactViewEngine` in `ReactController` (e.g. by returning only `"react.jsp"`, this yields in using the standard JSP ViewEngine),
-there will be no HTML code visible in the `<div id="content"/>` element if you look at the intial source code received from the server.
+there will be no HTML code visible in the `<div id="content"/>` element if you look at the initial source code received from the server.
 But the content will nevertheless be rendered and displayed in the browser, because of the client-side function call to `renderClient()`.
 
 As soon the application uses the `ReactViewEngine`, you will see the rendered content also in the `<div id="content"/>` element, received as source code from the server.
 
 The client-side execution of `renderClient()` is also performed, but as there is no change to the (virtual) DOM, the page stays as it is, there's no re-rendering of DOM elements (and thus no flickering).
 
-TIP: Use two different browsers and play with the application. Have a look at the application upating itself every 5 seconds and how the source code relates to these updates (or not).
+TIP: Use two different browsers and play with the application. Have a look at the application updating itself every 5 seconds and how the source code relates to these updates (or not).
 
