@@ -63,7 +63,7 @@ $ jjs -help
 
 === Scripting mode
 
-In addition to the ECMAScript 5.1 specification, Nashorn implements a number of own syntax and API extensions as well _(see one of the next chapters)_.
+In addition to the ECMAScript 5.1 specification, Nashorn implements a number of its own syntax and API extensions as well _(see one of the next chapters)_.
 Many of these extensions are only available in `scripting` mode. `Scripting` mode is turned on by using the cli option `--scripting`:
 
 [source,bash]
@@ -71,7 +71,7 @@ Many of these extensions are only available in `scripting` mode. `Scripting` mod
 $ jjs --scripting
 ----
 
-In `scripting` mode, nashorn accepts shell style `#` single line comments:
+In `scripting` mode, Nashorn accepts shell style `#` single line comments:
 
 [source,js]
 .test.js

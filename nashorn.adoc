@@ -8,7 +8,7 @@ So, for being able to evaluate JavaScript code from Java, we just create a new N
 ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");<1>
 engine.eval("print('Hello World');");
 ----
-<1> The Nashorn engine names you can use here are _"nashorn"_, "javascript"_ and _"js"_.
+<1> The Nashorn engine names you can use here are _"nashorn"_, _"javascript"_ and _"js"_.
 
 As seen above, JavaScript code can be evaluated directly by passing it as a string to the `eval()` method of the engine object.
 Alternatively you can parse (and evaluate) a `.js`-file by passing a `FileReader` object pointing to your file:
@@ -105,7 +105,7 @@ print(calcResult);
 
 ==== Nashorn type conversions
 
-With this little example, you can find out, how Nashorn handles type conversions between Java and JavaScript, when calling Java methods from JavaScript.
+With this little example, you can find out how Nashorn handles type conversions between Java and JavaScript, when calling Java methods from JavaScript.
 
 [source,java]
 ----
@@ -284,7 +284,7 @@ b.get("undefined"); // ECMAScript 'undefined' value
 
 If a variable is not found in `ENGINE_SCOPE`, `GLOBAL_SCOPE` bindings are being searched.
 
-WARNING: There's a confusion due to ECMAScript "global" properties being in `ENGINE_SCOPE` (toplevel _"this"_ in script) and not in `GLOBAL_SCOPE`.
+WARNING: There's a confusion due to ECMAScript "global" properties being in `ENGINE_SCOPE` (top-level _"this"_ in script) and not in `GLOBAL_SCOPE`.
 
 ---
 

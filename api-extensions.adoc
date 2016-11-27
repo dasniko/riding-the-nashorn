@@ -1,9 +1,9 @@
 == API and Language Extensions
 
-Nashorn comes along with quite a few language and API extensions, additionally to the ECMAScript standard.
+Nashorn comes along with quite a few language and API extensions, in addition to the ECMAScript standard.
 Most of the API extensions exist due to backward compatibility to Rhino.
 
-Let's have a look at some of the IMHO most useful and interessting ones.
+Let's have a look at some of the IMHO most useful and interesting ones.
 
 === Print Function
 
@@ -72,7 +72,7 @@ CAUTION: Don't mix this up with the new back quote string templates in ES6, they
 
 === Java Beans
 
-With Nashorn, you get direct access to the properties of a Java bean, no need to use getters and setters anymore:
+With Nashorn, you get direct access to the properties of a Java bean, no need to use getters and setters any more:
 
 [source,javascript]
 ----
@@ -85,13 +85,13 @@ print(date.year);  // -> no getter!
 
 === Function Literals
 
-For simple, one-line functions, we don't necessarily have to use curly braces (and can also ommit the `return` keyword):
+For simple, one-line functions, we don't necessarily have to use curly braces (and can also omit the `return` keyword):
 
 [source,javascript]
 ----
 function add(a, b) a + b;
 
-print(add(1, 2);  // 3
+print(add(1, 2));  // 3
 ----
 
 === Binding Properties
@@ -101,7 +101,7 @@ You can bind properties from one object to another object:
 [source,javascript]
 ----
 var o1 = {};
-var o2 = { foo: 'bar'};
+var o2 = { foo: 'bar' };
 
 Object.bindProperties(o1, o2);
 
@@ -131,7 +131,7 @@ print(__FILE__, __LINE__, __DIR__);
 
 === Import Scopes
 
-Sometimes it's useful to import many java packages at once.
+Sometimes it's useful to import many Java packages at once.
 We can use the class `JavaImporter` to be used in conjunction with the `with` statement.
 All class files from the imported packages are accessible within the local scope of the `with` statement:
 
@@ -146,7 +146,7 @@ with (imports) {
 
 === Packages
 
-Packages and related objects are there to support java package, class access from script.
+Packages and related objects are there to support Java package, class access from script.
 The properties of the `Packages` variable are all the top-level Java packages, such as `java`, `javax` etc.
 
 [source,javascript]
@@ -182,7 +182,7 @@ jjs> javax.swing.JFrame
 Native JavaScript arrays are untyped.
 Nashorn implements typed arrays as specified at https://www.khronos.org/registry/typedarray/specs/latest/.
 
-For example, create an array of `int` 's:
+For example, create an array of `int`s:
 
 [source,javascript]
 ----
@@ -209,7 +209,7 @@ array[0] = '3.14';
 print(array[0]);  // 3
 ----
 
-Our `int[]` array behaves like a real Java int array.
+Our `int[]` array behaves like a real Java `int` array.
 Additionally, Nashorn performs implicit type conversion when trying to add some non-integer values.
 Strings will automatically be converted to `int`, if possible.
 
@@ -229,7 +229,7 @@ myList.add('Joe');
 for each (var e in list) print(e);  // John, Jack, Joe
 ----
 
-Nashorns `for each` statement works like the `foreach` in Java.
+Nashorn's `for each` statement works like the `foreach` in Java.
 
 Or, let's use a `HashMap`:
 
@@ -351,10 +351,10 @@ TIP: As you can see, even multi-threaded code is possible in Nashorn.
 
 === Calling Super
 
-Accessing overridden members in JavaScript is traditionally awkward because Javas `super` keyword doesn't exist in ECMAScript.
-Luckily nashorn comes to the rescue.
+Accessing overridden members in JavaScript is traditionally awkward because Java's `super` keyword doesn't exist in ECMAScript.
+Luckily Nashorn comes to the rescue.
 
-First we define a super type in java code:
+First we define a super type in Java code:
 
 [source,java]
 ----
@@ -368,7 +368,7 @@ class SuperRunner implements Runnable {
 
 Next we override `SuperRunner` from JavaScript.
 Pay attention to the extended Nashorn syntax when creating a new `Runner` instance:
-The syntax of overriding members is borrowed from Javas anonymous objects.
+The syntax of overriding members is borrowed from Java's anonymous objects.
 
 [source,javascript]
 ----
@@ -421,7 +421,7 @@ Of course, the script is then only available in the Nashorn global context (not 
 
 === Error Object
 
-Nashorn extends the ECMAScript standard `Error` object by a few more interesting informations.
+Nashorn extends the ECMAScript standard `Error` object with a few more interesting properties.
 
 [source,javascript]
 ----
@@ -448,9 +448,9 @@ try {
 
 === Scripting Mode Extension Objects
 
-There are some global object defined in Nashorn, when `-scripting` mode is enabled.
+There are some global objects defined in Nashorn, when `-scripting` mode is enabled.
 
-Most of them are self-explaining, so I provided just some source code examples:
+Most of them are self-explaining, so I provide just some source code examples:
 
 ==== $ARG
 
@@ -502,7 +502,7 @@ Send this to stdout
 
 ==== $OUT
 
-Store the latest standard output (stdout) of the process spawned by `$EXEC`.
+Store the latest standard output (`stdout`) of the process spawned by `$EXEC`.
 
 [source,javascript]
 ----
@@ -516,7 +516,7 @@ print(weather.main.temp);
 
 ==== $ERR
 
-Store the latest standard error (stderr) of the process spawned by `$EXEC`.
+Store the latest standard error (`stderr`) of the process spawned by `$EXEC`.
 
 ==== $EXIT
 
@@ -524,7 +524,7 @@ Store the exit code of the process spawned by `$EXEC`.
 
 ==== $OPTIONS
 
-This property exposes command line options, which are passed (explit or implicitly) to Nashorn "command line".
+This property exposes command line options, which are passed (explicitly or implicitly) to Nashorn "command line".
 
 [source,javascript]
 ----

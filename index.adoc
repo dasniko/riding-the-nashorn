@@ -13,7 +13,7 @@ Niko Köbler <niko@n-k.de, http://www.n-k.de, https://twitter.com/dasniko[@dasni
 :pdf-page-size: A4
 
 Nashorn is the official JavaScript Engine in the Java Virtual Machine since Version 8.
-It supports and implements the http://www.ecma-international.org/ecma-262/5.1/[ECMAScript 5.1 specification] and competes among others directly with https://developers.google.com/v8/[Google V8] (the script enginge behind https://nodejs.org[Node.js]).
+It supports and implements the http://www.ecma-international.org/ecma-262/5.1/[ECMAScript 5.1 specification] and competes among others directly with https://developers.google.com/v8/[Google V8] (the script engine behind https://nodejs.org[Node.js]).
 Nashorn compiles JavaScript to Java Bytecode during runtime and thus provides high interoperability of Java and JavaScript.
 
 image::nashorn.jpg[Nashorn, width="600" align="center"]
@@ -23,7 +23,7 @@ After working through this tutorial you'll be able to use Nashorn and its dynami
 
 _Another good starting point for Nashorn resources might be the http://openjdk.java.net/projects/nashorn/[Official Project Nashorn Website] with links to the mailing-list, the blog and the wiki pages. Check it out!_
 
-IMPORTANT: Nashorn in JDK 8 implements, as mentioned above the ECMAScript 5.1 specification. But it's Nashorns strategy to follow the ECMAScript spec.
+IMPORTANT: Nashorn in JDK 8 implements, as mentioned above, the ECMAScript 5.1 specification. But it's Nashorn's strategy to follow the ECMAScript spec.
 So the follow up major releases of Nashorn will implement http://www.ecma-international.org/ecma-262/6.0/[ECMAScript 2015 spec].
 
 
